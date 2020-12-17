@@ -1,7 +1,7 @@
 ## Usage
 Đặt thẻ `<scripts>`  sau đây gần cuối các trang của bạn, ngay trước thẻ đóng `</body>`, để kích hoạt SDK.
 ```javascript
-<script src="payme-sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration/payme-sdk.min.js"></script>
    ```
 **Khởi tạo thư viện**
 
