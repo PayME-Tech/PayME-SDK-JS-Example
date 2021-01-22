@@ -1,7 +1,9 @@
 ## Usage
 Đặt thẻ `<scripts>`  sau đây gần cuối các trang của bạn, ngay trước thẻ đóng `</body>`, để kích hoạt SDK.
+
+**CDN via jsDelivr**
 ```javascript
-<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration/payme-sdk.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@2.0/payme-sdk.min.js"></script>
    ```
 **Khởi tạo thư viện**
 
@@ -11,6 +13,7 @@ Trước khi sử dụng PayME SDK cần gọi phương thức khởi tạo đ�
   let configs = {
     appToken,
     connectToken,
+    clientId,
     clientInfo: {
       clientId,
       platform,
@@ -38,7 +41,9 @@ Tham số gồm 2 Object truyền vào:
 |-------------|---------------|:---------:|--------------|
 | `appToken`  | `string`      | Yes       | AppId cấp riêng định danh cho mỗi web, cần truyền cho SDK để mã hóa. |  
 | `connectToken`  | `string`  |Yes        |Web cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |  
-| `clientInfo` | `object`     |Yes        |Gồm các item sau <ul><li>clientId</li><li>platform</li><li>appVersion</li><li>sdkVesion</li><li>sdkType</li><li>appPackageName</li></ul> | 
+| `clientId`  | `string`  |Yes        |Là device ID |  
+| `env`  | `string`  |Yes        |Môi trường chạy SDK |  
+| `clientInfo` | `object`     |Yes        |Gồm các item sau <ul><li>platform</li><li>appVersion</li><li>sdkVesion</li><li>sdkType</li><li>appPackageName</li></ul> | 
 | `partner`  | `object`  | No        |Gồm các item sau <ul><li>type</li><li>paddingTop</li></ul> |
 | `configColor`  | `array` | No       |Là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 
@@ -47,7 +52,6 @@ Tham số gồm 2 Object truyền vào:
 
 | Property    | Type      | Required   | Description  |
 |-------------|-----------|:----------:|--------------|
-| `env`  | `string`  | No |Môi trường sử dụng SDK. Default: `production` |  
 | `id`  | `string`  | Yes |Id của phần tử HTML. Ví dụ: `<div  id="paymeId"></div>` |  
 | `width` | `string` | No| Chiều rộng của iframe. Default: 415px | 
 | `height` | `string` | No | Chiều cao của iframe. Default: 800px| 
