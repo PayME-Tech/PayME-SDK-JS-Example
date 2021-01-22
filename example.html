@@ -49,6 +49,7 @@
         sdkType: '1.0.1',
         appPackageName: 'lazada.payme.vn'
       },
+      env: 'sandbox',
       partner: {
         type: 'Web',
         paddingTop: 20,
@@ -59,7 +60,6 @@
 
     function openWallet(id) {
       const view = new PaymeWebSdk(configs, {
-        env: 'sandbox',
         id: id
       });
       view.openWallet()
@@ -71,7 +71,6 @@
 
     function withdraw(id) {
       const view = new PaymeWebSdk(configs, {
-        env: 'sandbox',
         id: id
       });
       view.withdraw({
@@ -89,7 +88,6 @@
 
     function deposit(id) {
       const view = new PaymeWebSdk(configs, {
-        env: 'sandbox',
         id: id
       });
       view.deposit({
