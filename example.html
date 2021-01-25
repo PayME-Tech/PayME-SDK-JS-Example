@@ -39,8 +39,10 @@
   <script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@2.1/payme-sdk.min.js"></script>
   <script type="text/javascript">
     let configs = {
-      connectToken: 'qBpM18YIyB15rdpFFfJpzsUBXNkaQ9rnCAN3asLNCrmQODI5GMp+qK6rY2OgBwjcMpujvBbCLy0ZcrdPMUWcEiqCvawx39o26hDoID/CIu4ygLZK43UWdixYC5t/bhJr',
-      appToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MX0.wNtHVZ-olKe7OAkgLigkTSsLVQKv_YL9fHKzX9mn9II',
+      publicKey,
+      secretKey,
+      connectToken,
+      appToken,
       clientInfo: {
         clientId: 'deviceId',
         platform: 'WEB/IOS',
@@ -49,7 +51,8 @@
         sdkType: '1.0.1',
         appPackageName: 'lazada.payme.vn'
       },
-      env: 'sandbox',
+      clientId,
+      env,
       partner: {
         type: 'Web',
         paddingTop: 20,
