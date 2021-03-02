@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@2.1/payme-sdk.min.js"></script>
    ```
 **Đăng kí Merchant**
-- Bước 1: Vào đăng ký Merchant theo đường dẫn
+- Bước 1: Vào đăng ký Merchant theo trang đăng kí
 - Bước 2: Đăng kí kết nối SDK
 	- Tự genarate ra 1 bộ publicKey-privateKey
 	- Dùng puclicKey của bussiness + privateKey tự generate vào option kết nối
