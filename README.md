@@ -1,3 +1,4 @@
+
 ## Usage
 Đặt thẻ `<scripts>`  sau đây gần cuối các trang của bạn, ngay trước thẻ đóng `</body>`, để kích hoạt SDK.
 
@@ -5,6 +6,13 @@
 ```javascript
 <script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@2.1/payme-sdk.min.js"></script>
    ```
+**Đăng kí Merchant**
+- Bước 1: Vào đăng ký Merchant theo đường dẫn
+- Bước 2: Đăng kí kết nối SDK
+	- Tự genarate ra 1 bộ publicKey-privateKey
+	- Dùng puclicKey của bussiness + privateKey tự generate vào option kết nối
+	- Dùng appId vào option kết nối
+
 **Khởi tạo thư viện**
 
 Trước khi sử dụng PayME SDK cần gọi phương thức khởi tạo để khởi tạo SDK.
@@ -14,14 +22,10 @@ Trước khi sử dụng PayME SDK cần gọi phương thức khởi tạo đ�
     appToken,
     connectToken,
     clientId,
-    clientInfo: {
-      clientId,
-      platform,
-      appVersion,
-      sdkVesion,
-      sdkType,
-      appPackageName
-    }
+    configColor,
+    publicKey,
+    privateKey,
+    xApi
   }   
 </script>
 ```
@@ -41,12 +45,13 @@ Tham số gồm 2 Object truyền vào:
 |-------------|---------------|:---------:|--------------|
 | `appToken`  | `string`      | Yes       | AppId cấp riêng định danh cho mỗi web, cần truyền cho SDK để mã hóa. |  
 | `connectToken`  | `string`  |Yes        |Web cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |  
-| `clientId`  | `string`  |Yes        |Là device ID |  
+| `clientId`  | `string`  |Yes        |Finger Sprint |  
 | `env`  | `string`  |Yes        |Môi trường chạy SDK |  
-| `clientInfo` | `object`     |Yes        |Gồm các item sau <ul><li>platform</li><li>appVersion</li><li>sdkVesion</li><li>sdkType</li><li>appPackageName</li></ul> | 
 | `partner`  | `object`  | No        |Gồm các item sau <ul><li>type</li><li>paddingTop</li></ul> |
 | `configColor`  | `array` | No       |Là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
-
+| `publicKey`  | `string`  |Yes        |Key được tạo trên business |
+| `privateKey`  | `string`  |Yes        |Key tự genarate |
+| `xApi`  | `string`  |Yes        |Được tạo trên business |
 
  - **Object 2**: Gồm các params sau
 
