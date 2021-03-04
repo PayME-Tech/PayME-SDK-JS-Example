@@ -61,7 +61,15 @@ Tham số gồm 2 Object truyền vào:
 | `width` | `string` | No| Chiều rộng của iframe. Default: 415px | 
 | `height` | `string` | No | Chiều cao của iframe. Default: 800px| 
 
-Cách tạo **connectToken**: [https://developers.payme.vn/#khoi-tao-sdk-androi](https://developers.payme.vn/#khoi-tao-sdk-androi)
+Cách tạo **connectToken**:
+
+connectToken cần để truyền gọi api từ tới PayME và sẽ được tạo từ hệ thống backend của app tích hợp. Cấu trúc như sau:
+
+connectToken = AES256("{ timestamp: "2021-01-20T06:53:07.621Z", 
+                         userId : "ABC", 
+                         phone : "0909998877" }" 
+                      + secretKey )
+                      
 #### Các chức năng của PayME SDK
 **openWallet()- Mở iframe chức năng PayME tổng hợp**
 ```javascript
