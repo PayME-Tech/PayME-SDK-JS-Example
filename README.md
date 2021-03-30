@@ -29,7 +29,7 @@ Trước khi sử dụng PayME SDK cần gọi phương thức khởi tạo đ�
   }   
 </script>
 ```
-Thêm khởi tạo này trước các function deposit/withdraw/pay
+Thêm khởi tạo này trước các function
 ```javascript
 const view = new PaymeWebSdk(configs, {
   id
@@ -70,6 +70,15 @@ Cách tạo **connectToken**:
 connectToken cần để truyền gọi api từ tới PayME và sẽ được tạo từ hệ thống backend của app tích hợp. Cấu trúc như sau:
 
     connectToken = AES256("{ timestamp: 34343242342, userId : "ABC", phone : "0909998877" }" + secretKey )
+
+| **Tham số**    | **Bắt buộc**          |**Giải thích**   |
+|-------------|---------------|---------|
+|     **timestamp**        |     Yes          |Thời gian tạo ra connectToken theo định dạng iSO 8601 , Dùng để xác định thời gian timeout của connectToken. Ví dụ 2021-01-20T06:53:07.621Z     |
+|     _**userId**_       |       Yes        |Là giá trị cố định duy nhất tương ứng với mỗi tài khoản khách hàng ở dịch vụ, thường giá trị này do server hệ thống được tích hợp cấp cho PayME SDK         |
+|     _**phone**_       |      No         |Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null        |
+
+Trong đó _**AES**_ là hàm mã hóa theo thuật toán AES. Tùy vào ngôn ngữ ở server mà bên hệ thống dùng thư viện tương ứng. Xem thêm tại đây
+[https://en.wikipedia.org/wiki/Advanced_Encryption_Standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 
 #### Các chức năng của PayME SDK
 **openWallet()- Mở iframe chức năng PayME tổng hợp**
