@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import {PaymeWebSdk} from './PaymeSDK'
+// import {PaymeWebSdk} from './PaymeSDK'
 
 export class WebPaymeSDK extends Component {
   constructor(props) {
