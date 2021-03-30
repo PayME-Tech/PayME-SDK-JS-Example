@@ -4,7 +4,7 @@
 
 **CDN via jsDelivr**
 ```javascript
-<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@2.2/payme-sdk.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@3.0/payme-sdk.min.js"></script>
    ```
 **Đăng kí Merchant**
 - Bước 1: Vào đăng ký Merchant theo trang đăng kí
@@ -47,7 +47,7 @@ Tham số gồm 2 Object truyền vào:
 | `connectToken`  | `string`  |Yes        |Web cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |  
 | `clientId`  | `string`  |Yes        |Là deviceId của thiết bị (chỉ áp dụng cho bản web)|  
 | `env`  | `string`  |Yes        |Môi trường chạy SDK. Gồm một trong các môi trường sau: 'production', 'sandbox' |  
-| `partner`  | `object`  | No        | <ul><li>type: 'Web'</li></ul> |
+| `partner`  | `object`  | No        | <pre lang="json">{<br>  type: string // Web, android, iOS<br>  paddingTop: number // Tùy biến vị trí góc trên cùng khi thiết bị trên app có tùy biến header-statusbar <br>}</pre> |
 | `configColor`  | `array` | No       |Là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 | `publicKey`  | `string`  |Yes        |Key này được hệ thống cung cấp sau khi đăng ký merchant SDK |
 | `privateKey`  | `string`  |Yes        |Key tự generate khi đăng ký merchant SDK, khi đăng ký, merchant tạo ra 1 cặp key và gửi publicKey cho hệ thống và giữ lại privateKey này |
@@ -61,7 +61,16 @@ Tham số gồm 2 Object truyền vào:
 | `width` | `string` | No| Chiều rộng của iframe | 
 | `height` | `string` | No | Chiều cao của iframe| 
 
-Cách tạo **connectToken**: [https://developers.payme.vn/#khoi-tao-sdk-androi](https://developers.payme.vn/#khoi-tao-sdk-androi)
+configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào.
+
+![enter image description here](https://raw.githubusercontent.com/PayME-Tech/PayME-SDK-Android-Example/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png)
+
+Cách tạo **connectToken**:
+
+connectToken cần để truyền gọi api từ tới PayME và sẽ được tạo từ hệ thống backend của app tích hợp. Cấu trúc như sau:
+
+    connectToken = AES256("{ timestamp: 34343242342, userId : "ABC", phone : "0909998877" }" + secretKey )
+
 #### Các chức năng của PayME SDK
 **openWallet()- Mở iframe chức năng PayME tổng hợp**
 ```javascript
