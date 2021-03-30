@@ -47,7 +47,7 @@ Tham số gồm 2 Object truyền vào:
 | `connectToken`  | `string`  |Yes        |Web cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |  
 | `clientId`  | `string`  |Yes        |Là deviceId của thiết bị (chỉ áp dụng cho bản web)|  
 | `env`  | `string`  |Yes        |Môi trường chạy SDK. Gồm một trong các môi trường sau: 'production', 'sandbox' |  
-| `partner`  | `object`  | No        | <pre lang="json">{<br>  type: string // Web, android, iOS<br>  paddingTop: number // Tùy biến vị trí góc trên cùng khi thiết bị trên app có tùy biến header-statusbar <br>}</pre> |
+| `partner`  | `object`  | No        | <pre>{<br>  type: string // Web, android, iOS<br>  paddingTop: number // Tùy biến vị trí góc trên cùng khi thiết bị trên app có tùy biến header-statusbar <br>}</pre>|
 | `configColor`  | `array` | No       |Là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 | `publicKey`  | `string`  |Yes        |Key này được hệ thống cung cấp sau khi đăng ký merchant SDK |
 | `privateKey`  | `string`  |Yes        |Key tự generate khi đăng ký merchant SDK, khi đăng ký, merchant tạo ra 1 cặp key và gửi publicKey cho hệ thống và giữ lại privateKey này |
