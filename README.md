@@ -4,7 +4,7 @@
 
 **CDN via jsDelivr**
 ```javascript
-<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@3.0/payme-sdk.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/PayME-Tech/WebSDKIntegration@3.1/payme-sdk.min.js"></script>
    ```
 **Đăng kí Merchant**
 - Bước 1: Vào đăng ký Merchant theo trang đăng kí
