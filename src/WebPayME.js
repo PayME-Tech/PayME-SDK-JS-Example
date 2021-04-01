@@ -1,23 +1,65 @@
 import { Component } from 'react';
-// import {PaymeWebSdk} from './PaymeSDK'
+// import { PaymeWebSdk } from './PaymeSDK'
 
 export class WebPaymeSDK extends Component {
   constructor(props) {
-      super(props)
-      this.state = {
-        iframeVisible: { state: false, hidden: false }
-      }
-      this.configs = props.configs
-      // eslint-disable-next-line no-undef
-      this._webPaymeSDK = new PaymeWebSdk(props.configs, {id: 'paymeId'});
+    super(props)
+    this.state = {
+      iframeVisible: { state: false, hidden: false }, // Biến dùng để bật tắt iFreame
+    }
+    this.configs = {}
+    this.isLogin = false
+    this._webPaymeSDK = null
   }
 
+  _checkActiveAndKyc = () => {
+    if (this.configs?.accountStatus !== 'KYC_OK') {
+      alert(this.configs?.accountStatus)
+      return false
+    }
+    return true
+  }
+
+  login = (configs, callback) => {
+    this.configs = configs
+    // eslint-disable-next-line no-undef
+    this._webPaymeSDK = new PaymeWebSdk(configs, { id: 'paymeId' })
+
+    this.setState({
+      iframeVisible: { state: true, hidden: true },
+    })
+
+    this._webPaymeSDK.login()
+      .then(res => {
+        if (res) {
+          const newConfigs = {
+            ...this.configs,
+            ...res
+          }
+          this.configs = newConfigs
+          // eslint-disable-next-line no-undef
+          this._webPaymeSDK = new PaymeWebSdk(newConfigs, { id: 'paymeId' })
+          this.isLogin = true
+        }
+        console.log('ressss', res)
+        callback(res)
+      })
+      .catch(err => console.log(err))
+  }
+
+
   openWallet = () => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: false },
     })
 
     this._webPaymeSDK.openWallet().then(res => {
+      console.log('ressss', res)
       if (res.type === 'onClose') {
         this.setState({
           iframeVisible: { state: false, hidden: false },
@@ -27,6 +69,15 @@ export class WebPaymeSDK extends Component {
   }
 
   deposit = (param) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
+    if (!this._checkActiveAndKyc()) {
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: false },
     })
@@ -41,10 +92,19 @@ export class WebPaymeSDK extends Component {
   }
 
   withdraw = (param) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
+    if (!this._checkActiveAndKyc()) {
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: false },
     })
-    
+
     this._webPaymeSDK.withdraw(param).then(res => {
       if (res.type === 'onClose') {
         this.setState({
@@ -54,7 +114,35 @@ export class WebPaymeSDK extends Component {
     }).catch(err => console.log(err))
   }
 
+  pay = (param) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
+    if (!this._checkActiveAndKyc()) {
+      return
+    }
+
+    this.setState({
+      iframeVisible: { state: true, hidden: false },
+    })
+
+    this._webPaymeSDK.pay(param).then(res => {
+      if (res.type === 'onClose') {
+        this.setState({
+          iframeVisible: { state: false, hidden: false },
+        })
+      }
+    }).catch(err => console.log(err))
+  }
+
   getBalance = (callback) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: true },
     })
@@ -63,6 +151,11 @@ export class WebPaymeSDK extends Component {
   }
 
   getListService = (callback) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: true },
     })
@@ -71,6 +164,11 @@ export class WebPaymeSDK extends Component {
   }
 
   getAccountInfo = (callback) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: true },
     })
@@ -79,10 +177,19 @@ export class WebPaymeSDK extends Component {
   }
 
   openService = () => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
+    if (!this._checkActiveAndKyc()) {
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: false },
     })
-    
+
     this._webPaymeSDK.openService('HOCPHI').then(res => {
       if (res.type === 'onClose') {
         this.setState({
@@ -93,6 +200,11 @@ export class WebPaymeSDK extends Component {
   }
 
   getListPaymentMethod = (callback) => {
+    if (!this.isLogin) {
+      alert('NOT LOGIN')
+      return
+    }
+
     this.setState({
       iframeVisible: { state: true, hidden: true },
     })
@@ -102,7 +214,7 @@ export class WebPaymeSDK extends Component {
 
   render() {
     const { iframeVisible } = this.state
-    const {hidden} = iframeVisible
+    const { hidden } = iframeVisible
     const styleVisible = {
       display: 'block',
       position: 'fixed',
@@ -117,7 +229,7 @@ export class WebPaymeSDK extends Component {
 
     if (!iframeVisible.state) return null
     return (
-      <div style={hidden ? styleHidden: styleVisible} id='paymeId' />
+      <div style={hidden ? styleHidden : styleVisible} id='paymeId' />
     )
-  }    
+  }
 }
