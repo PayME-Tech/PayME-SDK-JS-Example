@@ -274,11 +274,17 @@ function App() {
   }
 
   const handleChangeUserId = (event) => {
-    setUserId(event.target.value)
+    const userIdValid = event.target.validity.valid
+        ? event.target.value
+        : userId
+    setUserId(userIdValid)
   }
 
   const handleChangePhoneNumber = (event) => {
-    setPhoneNumber(event.target.value)
+    const phoneNumberValid = event.target.validity.valid
+        ? event.target.value
+        : payMoney
+    setPhoneNumber(phoneNumberValid)
   }
 
   const handleChangeDepositMoney = (event) => {
@@ -385,12 +391,12 @@ function App() {
           <>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>UserId</p>
-              <input style={{ padding: 8 }} placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
+              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>Phone number</p>
-              <input style={{ padding: 8 }} placeholder="Optional" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
+              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Optional" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
