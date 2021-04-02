@@ -128,6 +128,7 @@ const connectToken = encrypted + cipher.final('base64')
 | **timestamp** | Yes | Thời gian tạo ra connectToken theo định dạng iSO 8601 , Dùng để xác định thời gian timeout của connectToken. Ví dụ 2021-01-20T06:53:07.621Z |
 | ***userId*** | Yes | là giá trị cố định duy nhất tương ứng với mỗi tài khoản khách hàng ở dịch vụ, thường giá trị này do server hệ thống được tích hợp cấp cho PayME SDK |
 | ***phone*** | No | Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null |
+
 Trong đó ***AES*** là hàm mã hóa theo thuật toán AES. Tùy vào ngôn ngữ ở server mà bên hệ thống dùng thư viện tương ứng. Xem thêm tại đây https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
 #### getAccountInfo
@@ -207,7 +208,7 @@ refExpoPaymeSDK.current.pay(data, response => {
 | note | No | Mô tả giao dịch từ phía đối tác. |
 | orderId | Yes | Mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch. |
 | storeId | Yes | ID của store phía công thanh toán thực hiên giao dịch thanh toán. |
-Trong trường hợp app tích hợp cần lấy số dư để tự hiển thị lên UI trên app thì có thể dùng hàm, hàm này không hiển thị UI của PayME SDK.
+
 #### getWalletInfo - Lấy các thông tin của ví
 ```javascript
 refExpoPaymeSDK.current.getWalletInfo(response => {
