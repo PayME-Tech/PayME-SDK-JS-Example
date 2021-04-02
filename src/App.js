@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import WebPaymeSDK  from 'web-payme-sdk';
+import WebPaymeSDK from 'web-payme-sdk';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Images } from './image';
+import { LoadingWeb } from './component/Loading';
 
 const CONFIGS = {
   production: {
@@ -78,6 +79,8 @@ function App() {
   const [isLogin, setIsLogin] = useState(false)
   const [showLog, setShowLog] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+
   const options = [
     'sandbox', 'production'
   ];
@@ -124,6 +127,7 @@ function App() {
     if (!checkUserId()) {
       return
     }
+    setLoading(true)
     const res = await fetch(`http://alcohol-delivery.toptravelasia.com/createConnectToken/${userId}/${secretKey}/${phoneNumber}`)
     if (res.status === 200) {
       const { connectToken } = await res.json()
@@ -150,10 +154,12 @@ function App() {
           alert("Login thành công.")
           setIsLogin(true)
           setTimeout(() => getBalance(), 100)
+          setLoading(false)
         } else {
           const message = data?.error?.[0]?.message
           alert(message ?? "Login thất bại.")
           setIsLogin(false)
+          setLoading(false)
         }
       })
     } else {
@@ -197,9 +203,11 @@ function App() {
   }
 
   const getBalance = () => {
+    setLoading(true)
     refPaymeSDK.current?.getBalance(response => {
       console.log("==========================object", response)
       setBalance(response?.balance ?? 0)
+      setLoading(false)
     })
   }
 
@@ -241,16 +249,20 @@ function App() {
   }
 
   const getListService = () => {
+    setLoading(true)
     refPaymeSDK.current?.getListService(data => {
       console.log("==========================object", data)
       alert(JSON.stringify(data))
+      setLoading(false)
     })
   }
 
   const getAccountInfo = () => {
+    setLoading(true)
     refPaymeSDK.current?.getAccountInfo(data => {
       console.log("==========================object", data)
       alert(JSON.stringify(data))
+      setLoading(false)
     })
   }
 
@@ -262,9 +274,11 @@ function App() {
   // }
 
   const getListPaymentMethod = () => {
+    setLoading(true)
     refPaymeSDK.current?.getListPaymentMethod(data => {
       console.log("==========================object", data)
       alert(JSON.stringify(data))
+      setLoading(false)
     })
   }
 
@@ -275,36 +289,36 @@ function App() {
 
   const handleChangeUserId = (event) => {
     const userIdValid = event.target.validity.valid
-        ? event.target.value
-        : userId
+      ? event.target.value
+      : userId
     setUserId(userIdValid)
   }
 
   const handleChangePhoneNumber = (event) => {
     const phoneNumberValid = event.target.validity.valid
-        ? event.target.value
-        : payMoney
+      ? event.target.value
+      : payMoney
     setPhoneNumber(phoneNumberValid)
   }
 
   const handleChangeDepositMoney = (event) => {
     const depositMoneyValid = event.target.validity.valid
-        ? event.target.value
-        : depositMoney
+      ? event.target.value
+      : depositMoney
     setDepositMoney(depositMoneyValid)
   }
 
   const handleChangeWithdrawMoney = (event) => {
     const withdrawMoneyValid = event.target.validity.valid
-        ? event.target.value
-        : withdrawMoney
+      ? event.target.value
+      : withdrawMoney
     setWithdrawMoney(withdrawMoneyValid)
   }
 
   const handleChangePayMoney = (event) => {
     const payMoneyValid = event.target.validity.valid
-    ? event.target.value
-    : payMoney
+      ? event.target.value
+      : payMoney
     setPayMoney(payMoneyValid)
   }
 
@@ -444,6 +458,7 @@ function App() {
         )}
         <WebPaymeSDK ref={refPaymeSDK} />
       </div>
+      <LoadingWeb loading={loading} />
     </>
   );
 }
