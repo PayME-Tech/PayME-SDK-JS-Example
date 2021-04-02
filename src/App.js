@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { WebPaymeSDK } from './WebPayME';
+import WebPaymeSDK  from 'web-payme-sdk';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
@@ -149,7 +149,7 @@ function App() {
         if (!data?.error) {
           alert("Login thành công.")
           setIsLogin(true)
-          getBalance()
+          setTimeout(() => getBalance(), 100)
         } else {
           const message = data?.error?.[0]?.message
           alert(message ?? "Login thất bại.")
