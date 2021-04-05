@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import WebPaymeSDK from 'web-payme-sdk';
+
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
@@ -71,9 +72,9 @@ function App() {
   const [privateKey, setPrivateKey] = useState(CONFIGS[env].privateKey)
   const [secretKey, setSecretKey] = useState(CONFIGS[env].secretKey)
 
-  const [payMoney, setPayMoney] = useState('')
-  const [depositMoney, setDepositMoney] = useState('')
-  const [withdrawMoney, setWithdrawMoney] = useState('')
+  const [payMoney, setPayMoney] = useState('10000')
+  const [depositMoney, setDepositMoney] = useState('10000')
+  const [withdrawMoney, setWithdrawMoney] = useState('10000')
 
   const [isSettings, setIsSettings] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
@@ -128,10 +129,9 @@ function App() {
       return
     }
     setLoading(true)
-    const res = await fetch(`http://alcohol-delivery.toptravelasia.com/createConnectToken/${userId}/${secretKey}/${phoneNumber}`)
+    const res = await fetch(`https://alcohol-delivery.toptravelasia.com/createConnectToken/${userId}/${secretKey}/${phoneNumber}`)
     if (res.status === 200) {
       const { connectToken } = await res.json()
-      console.log("connectToken", connectToken)
       const configs = {
         connectToken,
         appToken,
@@ -142,16 +142,14 @@ function App() {
           paddingTop: 20,
         },
         showLog: showLog ? "1" : "0",
-        configColor: ["#00ffff", "#ff0000"],
+        // configColor: ["#00ffff", "#ff0000"],
         publicKey: publicKey,
         privateKey: privateKey,
         xApi: appID,
       }
 
       refPaymeSDK.current?.login(configs, data => {
-        console.log("==========================object", data)
         if (!data?.error) {
-          alert("Login thành công.")
           setIsLogin(true)
           setTimeout(() => getBalance(), 100)
           setLoading(false)
@@ -164,6 +162,7 @@ function App() {
       })
     } else {
       alert("Tạo connectToken thất bại.")
+      setLoading(false)
     }
   }
 
@@ -203,11 +202,12 @@ function App() {
   }
 
   const getBalance = () => {
-    setLoading(true)
     refPaymeSDK.current?.getBalance(response => {
-      console.log("==========================object", response)
-      setBalance(response?.balance ?? 0)
-      setLoading(false)
+      if (response?.message !== 'NOT_ACTIVE' && response?.message !== 'NOT_KYC') {
+        setBalance(response?.balance ?? 0)
+      } else {
+        setBalance(0)
+      }
     })
   }
 
@@ -251,8 +251,9 @@ function App() {
   const getListService = () => {
     setLoading(true)
     refPaymeSDK.current?.getListService(data => {
-      console.log("==========================object", data)
-      alert(JSON.stringify(data))
+      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
+        alert(JSON.stringify(data))
+      }
       setLoading(false)
     })
   }
@@ -260,15 +261,15 @@ function App() {
   const getAccountInfo = () => {
     setLoading(true)
     refPaymeSDK.current?.getAccountInfo(data => {
-      console.log("==========================object", data)
-      alert(JSON.stringify(data))
+      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
+        alert(JSON.stringify(data))
+      }
       setLoading(false)
     })
   }
 
   // const openService = () => {
   //   refPaymeSDK.current?.openService(data => {
-  //     console.log("==========================object", data)
   //     alert(JSON.stringify(data))
   //   })
   // }
@@ -276,8 +277,9 @@ function App() {
   const getListPaymentMethod = () => {
     setLoading(true)
     refPaymeSDK.current?.getListPaymentMethod(data => {
-      console.log("==========================object", data)
-      alert(JSON.stringify(data))
+      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
+        alert(JSON.stringify(data))
+      }
       setLoading(false)
     })
   }
@@ -358,8 +360,8 @@ function App() {
               value={defaultOption}
               placeholder="Select an option"
             />
-            <div onClick={() => setIsSettings(!isSettings)} onKeyPress={() => setIsSettings(!isSettings)}>
-              <img style={{ marginLeft: 12 }} src={Images.settings} alt="" />
+            <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setIsSettings(!isSettings)} onKeyPress={() => setIsSettings(!isSettings)}>
+              <img style={{ marginLeft: 12 }} src={isSettings ? Images.leftArrow : Images.settings} alt="" />
             </div>
           </div>
         </div>
@@ -419,7 +421,7 @@ function App() {
             </div>
 
             {isLogin && (
-              <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '16px' }}>
+              <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '0px   16px' }}>
 
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                   <p>Balance</p>
@@ -430,28 +432,28 @@ function App() {
                     </div>
                   </div>
                 </div>
-                <button style={{ marginBottom: 12, borderRadius: 10, border: 'none', padding: 8 }} type="button" onClick={() => openWallet()}>Open Wallet</button>
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <button style={{ borderRadius: 10, border: 'none', padding: 8, flex: 1, marginRight: 16 }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeDepositMoney} />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <button style={{ borderRadius: 10, border: 'none', padding: 8, flex: 1, marginRight: 16 }} type="button" onClick={() => withdraw()}>Rút tiền ví</button>
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => withdraw()}>Rút tiền ví</button>
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={withdrawMoney} onChange={handleChangeWithdrawMoney} />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <button style={{ borderRadius: 10, border: 'none', padding: 8, flex: 1, marginRight: 16 }} type="button" onClick={() => pay()}>Thanh toán</button>
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
                 </div>
 
-                <button style={{ marginBottom: 12, borderRadius: 10, border: 'none', padding: 8 }} type="button" onClick={() => getListPaymentMethod()}>Get List Payment Method</button>
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListPaymentMethod()}>Get List Payment Method</button>
 
-                <button style={{ marginBottom: 12, borderRadius: 10, border: 'none', padding: 8 }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
-                <button style={{ marginBottom: 12, borderRadius: 10, border: 'none', padding: 8 }} type="button" onClick={() => getListService()}>Get List Service</button>
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListService()}>Get List Service</button>
               </div>
             )}
           </>
