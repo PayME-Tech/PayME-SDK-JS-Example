@@ -1,7 +1,10 @@
+**Giới thiệu**
 PayME SDK là bộ thư viện để các app có thể tương tác với PayME Platform. PayME SDK bao gồm các chức năng chính như sau:
 -   Hệ thống đăng ký, đăng nhập, eKYC thông qua tài khoản ví PayME
 -   Chức năng nạp rút chuyển tiền từ ví PayME.
 -   Tích hợp các dịch vụ của PayME Platform.
+
+Ví dụ tham khảo : https://sbx-sdk-demo.payme.net.vn
 
 **Một số thuật ngữ**
 |  | Name | Giải thích |
