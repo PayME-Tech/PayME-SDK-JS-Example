@@ -31,7 +31,6 @@ const CONFIGS = {
     appId: "7",
     storeId: 25092940
   },
-
   sandbox: {
     appToken:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTQsImlhdCI6MTYxNDE2NDI3MH0.MmzNL81YTx8XyTu6SczAqZtnCA_ALsn9GHsJGBKJSIk",
@@ -53,12 +52,33 @@ const CONFIGS = {
     appId: "14",
     storeId: 24088141
   },
+  dev: {
+    appToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6Njg2OH0.JyIdhQEX_Lx9CXRH4iHM8DqamLrMQJk5rhbslNW4GzY",
+    publicKey: `-----BEGIN PUBLIC KEY-----
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi
+      wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==
+      -----END PUBLIC KEY-----`,
+    privateKey: `-----BEGIN RSA PRIVATE KEY-----
+      MIIBOwIBAAJBAOkNeYrZOhKTS6OcPEmbdRGDRgMHIpSpepulZJGwfg1IuRM+ZFBm
+      F6NgzicQDNXLtaO5DNjVw1o29BFoK0I6+sMCAwEAAQJAVCsGq2vaulyyI6vIZjkb
+      5bBId8164r/2xQHNuYRJchgSJahHGk46ukgBdUKX9IEM6dAQcEUgQH+45ARSSDor
+      mQIhAPt81zvT4oK1txaWEg7LRymY2YzB6PihjLPsQUo1DLf3AiEA7Tv005jvNbNC
+      pRyXcfFIy70IHzVgUiwPORXQDqJhWJUCIQDeDiZR6k4n0eGe7NV3AKCOJyt4cMOP
+      vb1qJOKlbmATkwIhALKSJfi8rpraY3kLa4fuGmCZ2qo7MFTKK29J1wGdAu99AiAQ
+      dx6DtFyY8hoo0nuEC/BXQYPUjqpqgNOx33R4ANzm9w==
+      -----END RSA PRIVATE KEY-----`,
+    env: "DEV",
+    secretKey: "zfQpwE6iHbOeAfgX",
+    appId: "6868",
+    storeId: 6868
+  },
 }
 
 
 function App() {
   const refPaymeSDK = useRef(null)
-  const [env, setEnv] = useState("sandbox")
+  const [env, setEnv] = useState("dev")
   const [clientId, setClientId] = useState('')
 
   const [userId, setUserId] = useState('')
@@ -83,11 +103,10 @@ function App() {
   const [loading, setLoading] = useState(false)
 
   const options = [
-    'sandbox', 'production'
+    'dev', 'sandbox', 'production'
   ];
 
   const defaultOption = options[0];
-
 
   useEffect(() => {
     (async () => {
@@ -145,21 +164,27 @@ function App() {
         // configColor: ["#00ffff", "#ff0000"],
         publicKey: publicKey,
         privateKey: privateKey,
-        xApi: appID,
+        appID,
       }
 
-      refPaymeSDK.current?.login(configs, data => {
-        if (!data?.error) {
-          setIsLogin(true)
-          setTimeout(() => getBalance(), 100)
-          setLoading(false)
-        } else {
-          const message = data?.error?.[0]?.message
-          alert(message ?? "Login thất bại.")
-          setIsLogin(false)
-          setLoading(false)
+      refPaymeSDK.current?.login(configs,
+        (respone) => {
+          console.log('respone login', respone);
+          setIsLogin(true);
+          setLoading(false);
+          setTimeout(() => {
+            getBalance();
+          }, 100);
+        },
+        (error) => {
+          console.log('error login', error);
+          const message = error?.message;
+          alert(message ?? 'Login thất bại.');
+          setIsLogin(false);
+          setLoading(false);
         }
-      })
+
+      )
     } else {
       alert("Tạo connectToken thất bại.")
       setLoading(false)
@@ -202,13 +227,18 @@ function App() {
   }
 
   const getBalance = () => {
-    refPaymeSDK.current?.getBalance(response => {
-      if (response?.message !== 'NOT_ACTIVE' && response?.message !== 'NOT_KYC') {
-        setBalance(response?.balance ?? 0)
-      } else {
-        setBalance(0)
+    refPaymeSDK.current?.getBalance(
+      (response) => {
+        setLoading(false)
+        setBalance(response?.data?.balance ?? 0)
+      },
+      (error) => {
+        setLoading(false)
+        console.log('error getWalletInfo', error);
+        setBalance(0);
       }
-    })
+
+    )
   }
 
   const deposit = (param) => {
@@ -242,30 +272,48 @@ function App() {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
-      note: "note",
+      note: "note"
     }
 
-    refPaymeSDK.current?.pay(data)
+    refPaymeSDK.current?.pay(data,
+      (response) => {
+        console.log('onSucces', response)
+        setLoading(false)
+      },
+      (error) => {
+        setLoading(false)
+        console.log('error pay', error);
+      }
+    )
   }
 
   const getListService = () => {
     setLoading(true)
-    refPaymeSDK.current?.getListService(data => {
-      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
-        alert(JSON.stringify(data))
+    refPaymeSDK.current?.getListService(
+      (response) => {
+        console.log('====', response.data)
+        alert(JSON.stringify(response.data))
+        setLoading(false);
+      },
+      (error) => {
+        setLoading(false);
+        console.log('error getListService', error);
       }
-      setLoading(false)
-    })
+    )
   }
 
   const getAccountInfo = () => {
     setLoading(true)
-    refPaymeSDK.current?.getAccountInfo(data => {
-      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
-        alert(JSON.stringify(data))
+    refPaymeSDK.current?.getAccountInfo(
+      (response) => {
+        alert(JSON.stringify(response))
+        setLoading(false)
+      },
+      (error) => {
+        setLoading(false)
+        console.log('error getAccountInfo', error);
       }
-      setLoading(false)
-    })
+    )
   }
 
   // const openService = () => {
@@ -276,12 +324,16 @@ function App() {
 
   const getListPaymentMethod = () => {
     setLoading(true)
-    refPaymeSDK.current?.getListPaymentMethod(data => {
-      if (data !== 'NOT_ACTIVE' && data !== 'NOT_KYC') {
-        alert(JSON.stringify(data))
+    refPaymeSDK.current?.getListPaymentMethod(
+      (response) => {
+        alert(JSON.stringify(response))
+        setLoading(false)
+      },
+      (error) => {
+        setLoading(false)
+        console.log('error getListPaymentMethod', error);
       }
-      setLoading(false)
-    })
+    )
   }
 
   const onSelect = (selected) => {
