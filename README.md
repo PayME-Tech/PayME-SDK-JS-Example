@@ -12,7 +12,7 @@ PayME SDK là bộ thư viện để các app có thể tương tác với PayME
 | 3 | backend | Là hệ thống tích hợp hỗ trợ cho app, server hoặc api hỗ trợ |
 | 4 | AES | Hàm mã hóa dữ liệu AES. [Tham khảo](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) |
 | 5 | RSA| Thuật toán mã hóa dữ liệu RSA. |
-| 6 | IBN |Instant Payment Notification , dùng để thông báo giữa hệ thống backend của app và backend của PayME|
+| 6 | IPN |Instant Payment Notification , dùng để thông báo giữa hệ thống backend của app và backend của PayME|
 
 ## Cài đặt
 
@@ -69,13 +69,11 @@ const configs = {
    appToken,
    clientId,
    env,
-   partner: {
-     type: 'web'
-   },
    configColor,
    publicKey,
    privateKey,
-   appId
+   appId,
+   phone
 }
 refWebPaymeSDK.current.login(
    configs,
@@ -102,6 +100,7 @@ refWebPaymeSDK.current.login(
 | `privateKey` | `string` | app cần truyền vào để giải mã dữ liệu |
 | `connectToken` | `string` | app cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |
 | `clientId` | `string` | Là deviceId của thiết bị |
+| `env` | `string` | Là môi trường sử dụng SDK // sandbox, production |
 | `appId` | `string` | Là appID khi đăng ký merchant sdk sẽ đc hệ thống tạo cho |
 | `phone` | `string` | Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null |
 | `configColor` | `string[]` | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
@@ -260,8 +259,8 @@ refWebPaymeSDK.current.pay(
 | note | No | Mô tả giao dịch từ phía đối tác. |
 | orderId | Yes | Mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch. |
 | storeId | Yes | ID của store phía công thanh toán thực hiên giao dịch thanh toán. |
-| isShowResultUI | Yes | Option hiển thị UI kết quả thanh toán. |
-| method | Yes | (Tùy chọn có thể null) cung cấp ở hàm getPaymentMethods() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn |
+| isShowResultUI | No | Option hiển thị UI kết quả thanh toán. |
+| method | No | (Tùy chọn có thể null) cung cấp ở hàm getPaymentMethods() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn |
 | onSuccess | Yes | Dùng để bắt callback khi thực hiện giao dịch thành công từ PayME SDK |
 | onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
 
@@ -275,13 +274,9 @@ refWebPaymeSDK.current.getWalletInfo(response => {
 ```
 ```json
 {
-   "response":  {
-      "balance":  111,
-      "detail":  {
-      "cash":  1,
-      "lockCash":  2
-      }
-   }
+   "balance":  111,
+   "cash":  1,
+   "lockCash":  2
 }
 ```
 *balance*: App tích hợp có thể sử dụng giá trị trong key balance để hiển thị, các field khác hiện tại chưa dùng.

@@ -78,7 +78,7 @@ const CONFIGS = {
 
 function App() {
   const refPaymeSDK = useRef(null)
-  const [env, setEnv] = useState("dev")
+  const [env, setEnv] = useState("sandbox")
   const [clientId, setClientId] = useState('')
 
   const [userId, setUserId] = useState('')
@@ -106,7 +106,7 @@ function App() {
     'dev', 'sandbox', 'production'
   ];
 
-  const defaultOption = options[0];
+  const defaultOption = options[1];
 
   useEffect(() => {
     (async () => {
@@ -131,7 +131,7 @@ function App() {
     return true
   }
 
-  const checkMoney = (money) => {
+  const checkMoney = (money, type) => {
     const m = Number(money)
     if (m < 10000) {
       alert("Vui lòng nhập số tiền lớn hơn 10,000 đ.")
@@ -164,7 +164,8 @@ function App() {
         // configColor: ["#00ffff", "#ff0000"],
         publicKey: publicKey,
         privateKey: privateKey,
-        appID,
+        appId: appID,
+        phone: phoneNumber ?? ''
       }
 
       refPaymeSDK.current?.login(configs,
@@ -178,8 +179,15 @@ function App() {
         },
         (error) => {
           console.log('error login', error);
-          const message = error?.message;
-          alert(message ?? 'Login thất bại.');
+          let message = 'Login thất bại.';
+          if (error?.message) {
+            if (error?.message?.message) {
+              message = error?.message?.message
+            } else {
+              message = error?.message
+            }
+          }
+          alert(message);
           setIsLogin(false);
           setLoading(false);
         }
@@ -237,12 +245,11 @@ function App() {
         console.log('error getWalletInfo', error);
         setBalance(0);
       }
-
     )
   }
 
   const deposit = (param) => {
-    if (!checkMoney(depositMoney)) {
+    if (!checkMoney(depositMoney, 'DEPOSIT')) {
       return
     }
 
@@ -253,7 +260,7 @@ function App() {
   }
 
   const withdraw = (param) => {
-    if (!checkMoney(withdrawMoney)) {
+    if (!checkMoney(withdrawMoney, 'WITHDRAW')) {
       return
     }
 
@@ -264,7 +271,7 @@ function App() {
   }
 
   const pay = () => {
-    if (!checkMoney(payMoney)) {
+    if (!checkMoney(payMoney, 'PAY')) {
       return
     }
 
