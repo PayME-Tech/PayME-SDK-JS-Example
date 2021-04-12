@@ -179,15 +179,7 @@ function App() {
         },
         (error) => {
           console.log('error login', error);
-          let message = 'Login thất bại.';
-          if (error?.message) {
-            if (error?.message?.message) {
-              message = error?.message?.message
-            } else {
-              message = error?.message
-            }
-          }
-          alert(message);
+          showErrorMessage(error)
           setIsLogin(false);
           setLoading(false);
         }
@@ -230,6 +222,18 @@ function App() {
     setIsLogin(false)
   }
 
+  const showErrorMessage = (res) => {
+    let message = 'Có lỗi xảy ra';
+    if (res?.message) {
+      if (res?.message?.message) {
+        message = res?.message?.message
+      } else {
+        message = res?.message
+      }
+    }
+    alert(message);
+  }
+
   const openWallet = () => {
     refPaymeSDK.current?.openWallet()
   }
@@ -243,6 +247,7 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error getWalletInfo', error);
+        showErrorMessage(error)
         setBalance(0);
       }
     )
@@ -290,6 +295,7 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error pay', error);
+        showErrorMessage(error)
       }
     )
   }
@@ -305,6 +311,7 @@ function App() {
       (error) => {
         setLoading(false);
         console.log('error getListService', error);
+        showErrorMessage(error)
       }
     )
   }
@@ -319,6 +326,7 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error getAccountInfo', error);
+        showErrorMessage(error)
       }
     )
   }
@@ -339,6 +347,7 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error getListPaymentMethod', error);
+        showErrorMessage(error)
       }
     )
   }
