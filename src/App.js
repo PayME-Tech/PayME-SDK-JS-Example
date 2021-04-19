@@ -9,6 +9,19 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Images } from './image';
 import { LoadingWeb } from './component/Loading';
 
+const ERROR_CODE = {
+  EXPIRED: 401,
+  NETWORK: -1,
+  SYSTEM: -2,
+  LITMIT: -3,
+  ACCOUNT_NOT_ACTIVITIES: -4,
+  ACCOUNT_NOT_KYC: -5,
+  PAYMENT_ERROR: -6,
+  ERROR_KEY_ENCODE: -7,
+  USER_CANCELLED: -8,
+  NOT_LOGIN: -9
+}
+
 const CONFIGS = {
   // production: {
   //   appToken:
@@ -277,7 +290,7 @@ function App() {
         setLoading(false)
       },
       (error) => {
-        if (error?.code === 'NOT_LOGIN' || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
+        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
         console.log('onError deposit', error)
@@ -300,7 +313,7 @@ function App() {
         setLoading(false)
       },
       (error) => {
-        if (error?.code === 'NOT_LOGIN' || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
+        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
         console.log('onError deposit', error)
@@ -329,7 +342,7 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error pay', error);
-        if (error?.code === 'NOT_LOGIN' || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
+        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
       }
