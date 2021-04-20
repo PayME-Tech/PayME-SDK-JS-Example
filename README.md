@@ -265,7 +265,12 @@ refWebPaymeSDK.current.pay(
 #### getWalletInfo - Lấy các thông tin của ví
 ```javascript
 refWebPaymeSDK.current.getWalletInfo(response => {
-	// response.data
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
 })
 ```
 ```json
