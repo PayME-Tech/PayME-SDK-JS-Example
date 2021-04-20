@@ -105,8 +105,6 @@ refWebPaymeSDK.current.login(
 | `phone` | `string` | Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null |
 | `configColor` | `string[]` | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 
-configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào.
-
 [![img](https://github.com/PayME-Tech/PayME-SDK-Android-Example/raw/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)](https://github.com/PayME-Tech/PayME-SDK-Android-Example/blob/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)
 
 Cách tạo **connectToken**:
@@ -240,7 +238,7 @@ const  data = {
   storeId:  Number,
   extractData: String,
   note:  String,
-  isShowResultUI: true,
+  isShowResultUI: Boolean?,
   method: Object?
 }
 refWebPaymeSDK.current.pay(
@@ -259,7 +257,7 @@ refWebPaymeSDK.current.pay(
 | note | No | Mô tả giao dịch từ phía đối tác. |
 | orderId | Yes | Mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch. |
 | storeId | Yes | ID của store phía công thanh toán thực hiên giao dịch thanh toán. |
-| isShowResultUI | No | Option hiển thị UI kết quả thanh toán. |
+| isShowResultUI | No | Option hiển thị UI kết quả thanh toán. Default: true |
 | method | No | (Tùy chọn có thể null) cung cấp ở hàm getPaymentMethods() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn |
 | onSuccess | Yes | Dùng để bắt callback khi thực hiện giao dịch thành công từ PayME SDK |
 | onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
