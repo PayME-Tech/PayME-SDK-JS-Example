@@ -61,7 +61,7 @@ const CONFIGS = {
       A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
       -----END RSA PRIVATE KEY-----`,
     env: "SANDBOX",
-    secretKey: "de7bbe6566b0f1c38898b7751b057a94", 
+    secretKey: "de7bbe6566b0f1c38898b7751b057a94",
     appId: "14",
     storeId: 24088141
   },
@@ -97,7 +97,6 @@ function App() {
   const [userId, setUserId] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [balancce, setBalance] = useState(0)
-
 
   const [appID, setAppID] = useState(CONFIGS[env].appId)
   const [appToken, setAppToken] = useState(CONFIGS[env].appToken)
@@ -184,14 +183,14 @@ function App() {
       refPaymeSDK.current?.login(configs,
         (respone) => {
           console.log('respone login', respone);
-          alert('Login thành công')
+          // alert('Login thành công')
           setIsLogin(true);
           setLoading(false);
           getBalance();
         },
         (error) => {
           console.log('error login', error);
-          if (error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
+          if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_ACTIVED') {
             setIsLogin(true)
           } else {
             showErrorMessage(error)
@@ -254,8 +253,13 @@ function App() {
     refPaymeSDK.current?.openWallet(
       (response) => {
         setLoading(false)
+        console.log('onSucces openWallet', response)
       },
       (error) => {
+        console.log('onError openWallet', error)
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         showErrorMessage(error)
         setLoading(false)
       }
@@ -269,6 +273,10 @@ function App() {
         setBalance(response?.data?.balance ?? 0)
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          showErrorMessage(error)
+          logout()
+        }
         setLoading(false)
         console.log('error getWalletInfo', error);
         setBalance(0);
@@ -290,6 +298,9 @@ function App() {
         setLoading(false)
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
@@ -313,10 +324,13 @@ function App() {
         setLoading(false)
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
-        console.log('onError deposit', error)
+        console.log('onError withdraw', error)
         setLoading(false)
       }
     )
@@ -342,6 +356,9 @@ function App() {
       (error) => {
         setLoading(false)
         console.log('error pay', error);
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
           showErrorMessage(error)
         }
@@ -357,6 +374,9 @@ function App() {
         setLoading(false);
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         setLoading(false);
         console.log('error getListService', error);
         showErrorMessage(error)
@@ -372,6 +392,9 @@ function App() {
         setLoading(false)
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         setLoading(false)
         console.log('error getAccountInfo', error);
         showErrorMessage(error)
@@ -393,6 +416,9 @@ function App() {
         setLoading(false)
       },
       (error) => {
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
+        }
         setLoading(false)
         console.log('error getListPaymentMethod', error);
         showErrorMessage(error)
@@ -573,7 +599,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: 2021-04-16</p>
+              <p>Version: 2021-04-20</p>
             </div>
           </>
         )}
