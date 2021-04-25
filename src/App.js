@@ -14,12 +14,13 @@ const ERROR_CODE = {
   NETWORK: -1,
   SYSTEM: -2,
   LITMIT: -3,
-  ACCOUNT_NOT_ACTIVITIES: -4,
-  ACCOUNT_NOT_KYC: -5,
+  NOT_ACTIVED: -4,
+  NOT_KYC: -5,
   PAYMENT_ERROR: -6,
   ERROR_KEY_ENCODE: -7,
   USER_CANCELLED: -8,
-  NOT_LOGIN: -9
+  NOT_LOGIN: -9,
+  CLOSE_IFRAME: -10
 }
 
 const CONFIGS = {
@@ -91,6 +92,7 @@ const CONFIGS = {
 
 function App() {
   const refPaymeSDK = useRef(null)
+  const appRef = useRef(null)
   const [env, setEnv] = useState("sandbox")
   const [clientId, setClientId] = useState('')
 
@@ -111,6 +113,8 @@ function App() {
   const [isSettings, setIsSettings] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
   const [showLog, setShowLog] = useState(false)
+
+  const [isOpen, setIsOpen] = useState(false)
 
   const [loading, setLoading] = useState(false)
 
@@ -190,7 +194,7 @@ function App() {
         },
         (error) => {
           console.log('error login', error);
-          if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_ACTIVED') {
+          if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_ACTIVED) {
             setIsLogin(true)
           } else {
             showErrorMessage(error)
@@ -250,20 +254,28 @@ function App() {
   }
 
   const openWallet = () => {
-    refPaymeSDK.current?.openWallet(
-      (response) => {
-        setLoading(false)
-        console.log('onSucces openWallet', response)
-      },
-      (error) => {
-        console.log('onError openWallet', error)
-        if (error?.code === ERROR_CODE.EXPIRED) {
-          logout()
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.openWallet(
+        (response) => {
+          setLoading(false)
+          console.log('onSucces openWallet', response)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            showErrorMessage(error)
+          }
+          setLoading(false)
+          console.log('onError openWallet', error)
         }
-        showErrorMessage(error)
-        setLoading(false)
-      }
-    )
+      )
+    }, 100)
   }
 
   const getBalance = () => {
@@ -292,22 +304,31 @@ function App() {
     const data = {
       amount: env === 'sandbox' ? Number(depositMoney) : 10000
     }
-    refPaymeSDK.current?.deposit(data,
-      (response) => {
-        console.log('onSucces', response)
-        setLoading(false)
-      },
-      (error) => {
-        if (error?.code === ERROR_CODE.EXPIRED) {
-          logout()
+
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.deposit(data,
+        (response) => {
+          console.log('onSucces', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+              showErrorMessage(error)
+            }
+          }
+          console.log('onError deposit', error)
+          setLoading(false)
         }
-        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
-          showErrorMessage(error)
-        }
-        console.log('onError deposit', error)
-        setLoading(false)
-      }
-    )
+      )
+    }, 100)
   }
 
   const withdraw = (param) => {
@@ -318,22 +339,31 @@ function App() {
     const data = {
       amount: env === 'sandbox' ? Number(withdrawMoney) : 10000
     }
-    refPaymeSDK.current?.withdraw(data,
-      (response) => {
-        console.log('onSucces', response)
-        setLoading(false)
-      },
-      (error) => {
-        if (error?.code === ERROR_CODE.EXPIRED) {
-          logout()
+
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.withdraw(data,
+        (response) => {
+          console.log('onSucces', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+              showErrorMessage(error)
+            }
+          }
+          console.log('onError withdraw', error)
+          setLoading(false)
         }
-        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
-          showErrorMessage(error)
-        }
-        console.log('onError withdraw', error)
-        setLoading(false)
-      }
-    )
+      )
+    }, 100)
   }
 
   const pay = () => {
@@ -348,22 +378,30 @@ function App() {
       note: "note"
     }
 
-    refPaymeSDK.current?.pay(data,
-      (response) => {
-        console.log('onSucces', response)
-        setLoading(false)
-      },
-      (error) => {
-        setLoading(false)
-        console.log('error pay', error);
-        if (error?.code === ERROR_CODE.EXPIRED) {
-          logout()
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.pay(data,
+        (response) => {
+          console.log('onSucces', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+              showErrorMessage(error)
+            }
+          }
+          setLoading(false)
+          console.log('error pay', error);
         }
-        if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === 'NOT_KYC' || error?.code === 'NOT_ACTIVED') {
-          showErrorMessage(error)
-        }
-      }
-    )
+      )
+    }, 100)
   }
 
   const getListService = () => {
@@ -492,7 +530,7 @@ function App() {
 
   return (
     <>
-      <div className="App">
+      <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '0px 16px', alignItems: 'center' }}>
           <p>Enviroment</p>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -517,22 +555,22 @@ function App() {
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>App Token</p>
-              <textarea placeholder="Optional" value={appToken} onChange={handleChangeAppToken} />
+              <textarea placeholder="Required" value={appToken} onChange={handleChangeAppToken} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>PayME Public Key (RSA)</p>
-              <textarea placeholder="Optional" value={publicKey} onChange={handleChangePublicKey} rows={5} cols={5} />
+              <textarea placeholder="Required" value={publicKey} onChange={handleChangePublicKey} rows={5} cols={5} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>App Private Key (RSA)</p>
-              <textarea placeholder="Optional" value={privateKey} onChange={handleChangePrivateKey} rows={10} cols={10} />
+              <textarea placeholder="Required" value={privateKey} onChange={handleChangePrivateKey} rows={10} cols={10} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>Secret key (AES)</p>
-              <input style={{ padding: 8 }} placeholder="Optional" type='text' value={secretKey} onChange={handleChangeSecretKey} />
+              <input style={{ padding: 8 }} placeholder="Required" type='text' value={secretKey} onChange={handleChangeSecretKey} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
@@ -554,7 +592,7 @@ function App() {
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>Phone number</p>
-              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Optional" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
+              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder={env === 'dev' ? "Required" : 'Optional'} type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
