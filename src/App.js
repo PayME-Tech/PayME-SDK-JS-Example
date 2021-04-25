@@ -637,7 +637,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: 2021-04-20</p>
+              <p>Version: 2021-04-23</p>
             </div>
           </>
         )}
