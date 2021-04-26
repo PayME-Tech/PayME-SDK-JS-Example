@@ -102,7 +102,7 @@ refWebPaymeSDK.current.login(
 | `clientId` | `string` | Là deviceId của thiết bị |
 | `env` | `string` | Là môi trường sử dụng SDK // sandbox, production |
 | `appId` | `string` | Là appID khi đăng ký merchant sdk sẽ đc hệ thống tạo cho |
-| `phone` | `string` | Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null |
+| `phone` | `string` | Số điện thoại của hệ thống tích hợp |
 | `configColor` | `string[]` | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 
 [![img](https://github.com/PayME-Tech/PayME-SDK-Android-Example/raw/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)](https://github.com/PayME-Tech/PayME-SDK-Android-Example/blob/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)
@@ -128,7 +128,7 @@ const connectToken = encrypted + cipher.final('base64')
 | :------------ | :----------- | :----------------------------------------------------------- |
 | **timestamp** | Yes | Thời gian tạo ra connectToken theo định dạng iSO 8601 , Dùng để xác định thời gian timeout của connectToken. Ví dụ 2021-01-20T06:53:07.621Z |
 | ***userId*** | Yes | là giá trị cố định duy nhất tương ứng với mỗi tài khoản khách hàng ở dịch vụ, thường giá trị này do server hệ thống được tích hợp cấp cho PayME SDK |
-| ***phone*** | No | Số điện thoại của hệ thống tích hợp, nếu hệ thống không dùng số điện thoại thì có thể không cần truyền lên hoặc truyền null |
+| ***phone*** | Yes | Số điện thoại của hệ thống tích hợp |
 
 Trong đó ***AES*** là hàm mã hóa theo thuật toán AES. Tùy vào ngôn ngữ ở server mà bên hệ thống dùng thư viện tương ứng. Xem thêm tại đây https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 

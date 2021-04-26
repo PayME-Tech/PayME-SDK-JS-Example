@@ -144,6 +144,10 @@ function App() {
       alert("userID is required!")
       return false
     }
+    if (phoneNumber === '') {
+      alert("Phone Number is required!")
+      return false
+    }
     return true
   }
 
@@ -592,7 +596,7 @@ function App() {
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>Phone number</p>
-              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder={env === 'dev' ? "Required" : 'Optional'} type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
+              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
