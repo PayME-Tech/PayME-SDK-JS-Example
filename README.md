@@ -67,7 +67,7 @@ Sau khi gọi login() thành công rồi thì mới gọi các chức năng khá
 const configs = {
    connectToken,
    appToken,
-   clientId,
+   deviceId,
    env,
    configColor,
    publicKey,
@@ -96,12 +96,12 @@ refWebPaymeSDK.current.login(
 | Property | Type | Description |
 | -------------- | ---------- | ------------------------------------------------------------ |
 | `appToken` | `string` | AppId cấp riêng định danh cho mỗi app, cần truyền cho SDK để mã hóa. |
-| `publicKey` | `string` | Dùng để mã hóa dữ liệu, app tích hợp cần truyền cho SDK để mã hóa. |
-| `privateKey` | `string` | app cần truyền vào để giải mã dữ liệu |
+| `publicKey` | `string` | Dùng để mã hóa dữ liệu, app tích hợp cần truyền cho SDK để mã hóa. Do hệ thống PayME cung cấp cho app tích hợp. |
+| `privateKey` | `string` | app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
 | `connectToken` | `string` | app cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |
-| `clientId` | `string` | Là deviceId của thiết bị |
-| `env` | `string` | Là môi trường sử dụng SDK // sandbox, production |
-| `appId` | `string` | Là appID khi đăng ký merchant sdk sẽ đc hệ thống tạo cho |
+| `deviceId` | `string` | Là deviceId của thiết bị |
+| `env` | `string` | Là môi trường sử dụng SDK (sandbox, production) |
+| `appId` | `string` | Là appID khi đăng ký merchant sdk sẽ được hệ thống tạo cho |
 | `phone` | `string` | Số điện thoại của hệ thống tích hợp |
 | `configColor` | `string[]` | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
 
@@ -147,7 +147,14 @@ refWebPaymeSDK.current.getAccountInfo(
 #### openWallet - Mở UI chức năng PayME tổng hợp
 Hàm này được gọi khi từ app tích hợp khi muốn gọi 1 chức năng PayME bằng cách truyền vào tham số Action như trên.
 ```javascript
-refWebPaymeSDK.current.openWallet()
+refWebPaymeSDK.current.openWallet(
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
+)
 ```
 #### deposit - Nạp tiền
 ```javascript
