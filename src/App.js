@@ -8,6 +8,9 @@ import 'react-dropdown/style.css';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Images } from './image';
 import { LoadingWeb } from './component/Loading';
+import { encrypt } from './helper/genConnectToken';
+import ClickNHold from './component/ClickMultiple';
+import { useMediaQuery } from 'react-responsive';
 
 const ERROR_CODE = {
   EXPIRED: 401,
@@ -23,7 +26,7 @@ const ERROR_CODE = {
   CLOSE_IFRAME: -10
 }
 
-const CONFIGS = {
+let CONFIGS = {
   // production: {
   //   appToken:
   //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
@@ -91,10 +94,15 @@ const CONFIGS = {
 
 
 function App() {
+  const isDesktop = useMediaQuery({ minWidth: 992 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 })
+
   const refPaymeSDK = useRef(null)
   const appRef = useRef(null)
   const [env, setEnv] = useState("sandbox")
-  const [clientId, setClientId] = useState('')
+  const [deviceId, setDeviceId] = useState('')
+
+  const [isModal, setIsModal] = useState(false)
 
   const [userId, setUserId] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -118,9 +126,9 @@ function App() {
 
   const [loading, setLoading] = useState(false)
 
-  const options = [
+  const [options, setOptions] = useState([
     'dev', 'sandbox'
-  ];
+  ])
 
   const defaultOption = options[1];
 
@@ -135,7 +143,7 @@ function App() {
 
       // This is the visitor identifier:
       const visitorId = result.visitorId;
-      setClientId(visitorId)
+      setDeviceId(visitorId)
     })();
   }, [])
 
@@ -168,13 +176,12 @@ function App() {
       return
     }
     setLoading(true)
-    const res = await fetch(`https://alcohol-delivery.toptravelasia.com/createConnectToken/${userId}/${secretKey}/${phoneNumber}`)
-    if (res.status === 200) {
-      const { connectToken } = await res.json()
+    try {
+      const connectToken = encrypt(JSON.stringify({ userId, timestamp: Date.now(), phone: phoneNumber }), secretKey)
       const configs = {
         connectToken,
         appToken,
-        clientId,
+        deviceId,
         env,
         partner: {
           type: "web",
@@ -208,9 +215,10 @@ function App() {
         }
 
       )
-    } else {
-      alert("Tạo connectToken thất bại.")
+    } catch (error) {
+      console.log('error', error)
       setLoading(false)
+      alert('Tạo connectToken thất bại')
     }
   }
 
@@ -259,6 +267,7 @@ function App() {
 
   const openWallet = () => {
     appRef.current.scrollTo(0, 0)
+    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.openWallet(
@@ -275,6 +284,7 @@ function App() {
             }
             showErrorMessage(error)
           }
+          setIsModal(false)
           setLoading(false)
           console.log('onError openWallet', error)
         }
@@ -310,6 +320,7 @@ function App() {
     }
 
     appRef.current.scrollTo(0, 0)
+    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.deposit(data,
@@ -324,11 +335,12 @@ function App() {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
             }
-            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
               showErrorMessage(error)
             }
           }
           console.log('onError deposit', error)
+          setIsModal(false)
           setLoading(false)
         }
       )
@@ -345,6 +357,7 @@ function App() {
     }
 
     appRef.current.scrollTo(0, 0)
+    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.withdraw(data,
@@ -359,11 +372,12 @@ function App() {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
             }
-            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
               showErrorMessage(error)
             }
           }
           console.log('onError withdraw', error)
+          setIsModal(false)
           setLoading(false)
         }
       )
@@ -383,6 +397,7 @@ function App() {
     }
 
     appRef.current.scrollTo(0, 0)
+    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.pay(data,
@@ -397,11 +412,12 @@ function App() {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
             }
-            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.ACCOUNT_NOT_KYC || error?.code === ERROR_CODE.ACCOUNT_NOT_ACTIVITIES) {
+            if (error?.code === ERROR_CODE.NOT_LOGIN) {
               showErrorMessage(error)
             }
           }
           setLoading(false)
+          setIsModal(false)
           console.log('error pay', error);
         }
       )
@@ -532,11 +548,45 @@ function App() {
     setShowLog(event.target.checked)
   }
 
+  const onSwitchEnv = (e, enough) => {
+    if (enough) {
+      CONFIGS = {
+        ...CONFIGS,
+        production: {
+          appToken:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
+          publicKey: `-----BEGIN PUBLIC KEY-----
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
+      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
+      -----END PUBLIC KEY-----`,
+          privateKey: `-----BEGIN RSA PRIVATE KEY-----
+      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
+      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
+      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
+      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
+      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
+      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
+      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
+      -----END RSA PRIVATE KEY-----`,
+          env: "PRODUCTION",
+          secretKey: "bda4d9de88f37efb93342d8764ac9b84",
+          appId: "7",
+          storeId: 25092940
+        },
+      }
+      setOptions([...options, 'production'])
+    }
+  }
+
   return (
     <>
       <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '0px 16px', alignItems: 'center' }}>
-          <p>Enviroment</p>
+          <ClickNHold
+            time={4}
+            onEnd={onSwitchEnv}>
+            <p>Enviroment</p>
+          </ClickNHold>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <Dropdown
               options={options}
@@ -641,11 +691,20 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: 2021-04-23</p>
+              <p>Version: 2021-05-10</p>
             </div>
           </>
         )}
-        <WebPaymeSDK ref={refPaymeSDK} />
+        <div style={{display: isModal ? 'block' : 'none'}} className='modal'>
+          <WebPaymeSDK ref={refPaymeSDK} propStyle={{
+            maxWidth: 500,
+            height: (isDesktop || isTablet) ? '90%' : '100%',
+            overflow: 'hidden',
+            paddingTop: (isDesktop || isTablet) ? '5%' : '0%',
+            margin: 'auto',
+            alignSelf: 'center'
+          }} />
+        </div>
       </div>
       <LoadingWeb loading={loading} />
     </>

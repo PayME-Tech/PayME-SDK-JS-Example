@@ -47,10 +47,15 @@ import WebPaymeSDK from 'web-payme-sdk'
 class Example extends Component {
   const refWebPaymeSDK = useRef(null)
   render() {
-    return <WebPaymeSDK ref={refWebPaymeSDK} />
+    return <WebPaymeSDK ref={refWebPaymeSDK} propStyle={propStyle} />
   }
 }
 ```
+
+#### Parameters
+| Property | Type | Description |
+| -------------- | ---------- | ------------------------------------------------------------ |
+| `propStyle` | `object` | Custom style cho component |
 
 ### Các chức năng của PayME SDK
 
