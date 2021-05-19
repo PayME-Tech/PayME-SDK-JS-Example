@@ -331,16 +331,18 @@ function App() {
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
+            setIsModal(false)
           } else {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
+              setIsModal(false)
             }
             if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
               showErrorMessage(error)
+              setIsModal(false)
             }
           }
           console.log('onError deposit', error)
-          setIsModal(false)
           setLoading(false)
         }
       )
@@ -368,16 +370,18 @@ function App() {
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
+            setIsModal(false)
           } else {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
+              setIsModal(false)
             }
             if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
               showErrorMessage(error)
+              setIsModal(false)
             }
           }
           console.log('onError withdraw', error)
-          setIsModal(false)
           setLoading(false)
         }
       )
@@ -408,16 +412,18 @@ function App() {
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
+            setIsModal(false)
           } else {
             if (error?.code === ERROR_CODE.EXPIRED) {
               logout()
+              setIsModal(false)
             }
             if (error?.code === ERROR_CODE.NOT_LOGIN) {
               showErrorMessage(error)
+              setIsModal(false)
             }
           }
           setLoading(false)
-          setIsModal(false)
           console.log('error pay', error);
         }
       )
