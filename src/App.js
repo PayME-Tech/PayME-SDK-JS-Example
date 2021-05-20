@@ -372,7 +372,7 @@ function App() {
         (response) => {
           console.log('onSucces Withdraw', response)
           setLoading(false)
-          if (response?.type === 'onDeposit') {
+          if (response?.type === 'onWithdraw') {
             setIsModal(false)
           }
         },
