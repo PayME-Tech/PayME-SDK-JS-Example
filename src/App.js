@@ -320,6 +320,9 @@ function App() {
         (response) => {
           console.log('onSucces Deposit', response)
           setLoading(false)
+          if (response?.type === 'onDeposit') {
+            setIsModal(false)
+          }
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
@@ -355,6 +358,9 @@ function App() {
         (response) => {
           console.log('onSucces Withdraw', response)
           setLoading(false)
+          if (response?.type === 'onWithdraw') {
+            setIsModal(false)
+          }
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
