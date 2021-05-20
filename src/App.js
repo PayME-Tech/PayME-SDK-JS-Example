@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import WebPaymeSDK from 'web-payme-sdk';
+// import WebPaymeSDK from './PaymeSDK';
 
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -10,7 +11,6 @@ import { Images } from './image';
 import { LoadingWeb } from './component/Loading';
 import { encrypt } from './helper/genConnectToken';
 import ClickNHold from './component/ClickMultiple';
-import { useMediaQuery } from 'react-responsive';
 
 const ERROR_CODE = {
   EXPIRED: 401,
@@ -71,38 +71,33 @@ let CONFIGS = {
   },
   dev: {
     appToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6Njg2OH0.JyIdhQEX_Lx9CXRH4iHM8DqamLrMQJk5rhbslNW4GzY",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU",
     publicKey: `-----BEGIN PUBLIC KEY-----
-      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKWcehEELB4GdQ4cTLLQroLqnD3AhdKi
-      wIhTJpAi1XnbfOSrW/Ebw6h1485GOAvuG/OwB+ScsfPJBoNJeNFU6J0CAwEAAQ==
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJi70XBS5+LtaCrNsrnWlVG6xec+J9M1
+      DzzvsmDfqRgTIw7RQ94SnEBBcTXhaIAZ8IW7OIWkVU0OXcybQEoLsdUCAwEAAQ==
       -----END PUBLIC KEY-----`,
     privateKey: `-----BEGIN RSA PRIVATE KEY-----
-      MIIBOwIBAAJBAOkNeYrZOhKTS6OcPEmbdRGDRgMHIpSpepulZJGwfg1IuRM+ZFBm
-      F6NgzicQDNXLtaO5DNjVw1o29BFoK0I6+sMCAwEAAQJAVCsGq2vaulyyI6vIZjkb
-      5bBId8164r/2xQHNuYRJchgSJahHGk46ukgBdUKX9IEM6dAQcEUgQH+45ARSSDor
-      mQIhAPt81zvT4oK1txaWEg7LRymY2YzB6PihjLPsQUo1DLf3AiEA7Tv005jvNbNC
-      pRyXcfFIy70IHzVgUiwPORXQDqJhWJUCIQDeDiZR6k4n0eGe7NV3AKCOJyt4cMOP
-      vb1qJOKlbmATkwIhALKSJfi8rpraY3kLa4fuGmCZ2qo7MFTKK29J1wGdAu99AiAQ
-      dx6DtFyY8hoo0nuEC/BXQYPUjqpqgNOx33R4ANzm9w==
+      MIIBOgIBAAJBAIA7GmDWkjuOQsx99tACXhOlJ4atsBN0YMPEmKhi9Ewk6bNBPvaX
+      pRMWjn7c8GfWrFUIVqlrvSlMYxmW/XaATjcCAwEAAQJAKZ6FPj8GcWwIBEUyEWtj
+      S28EODMxfe785S1u+uA7OGcerljPNOTme6iTuhooO5pB9Q5N7nB2KzoWOADwPOS+
+      uQIhAN2S5dxxadDL0wllNGeux7ltES0z2UfW9+RViByX/fAbAiEAlCd86Hy6otfd
+      k9K2YeylsdDwZfmkKq7p27ZcNqVUlBUCIQCxzEfRHdzoZDZjKqfjrzerTp7i4+Eu
+      KYzf19aSA1ENEwIgAnyXMB/H0ivlYDHNNd+O+GkVX+DMzJqa+kEZUyF7RfECICtK
+      rkcDyRzI6EtUFG+ALQOUliRRh7aiGXXZYb2KnlKy
       -----END RSA PRIVATE KEY-----`,
     env: "DEV",
-    secretKey: "zfQpwE6iHbOeAfgX",
-    appId: "6868",
-    storeId: 6868
+    secretKey: "34cfcd29432cdd5feaecb87519046e2d",
+    appId: "12",
+    storeId: 9
   },
 }
 
 
 function App() {
-  const isDesktop = useMediaQuery({ minWidth: 992 })
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 })
-
   const refPaymeSDK = useRef(null)
   const appRef = useRef(null)
   const [env, setEnv] = useState("sandbox")
   const [deviceId, setDeviceId] = useState('')
-
-  const [isModal, setIsModal] = useState(false)
 
   const [userId, setUserId] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -200,8 +195,8 @@ function App() {
           console.log('respone login', respone);
           // alert('Login thành công')
           setIsLogin(true);
-          setLoading(false);
           getBalance();
+          // setLoading(false);
         },
         (error) => {
           console.log('error login', error);
@@ -267,7 +262,6 @@ function App() {
 
   const openWallet = () => {
     appRef.current.scrollTo(0, 0)
-    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.openWallet(
@@ -284,7 +278,6 @@ function App() {
             }
             showErrorMessage(error)
           }
-          setIsModal(false)
           setLoading(false)
           console.log('onError openWallet', error)
         }
@@ -316,32 +309,28 @@ function App() {
     }
 
     const data = {
-      amount: env === 'sandbox' ? Number(depositMoney) : 10000
+      amount: env === 'sandbox' ? Number(depositMoney) : 10000,
+      closeWhenDone: true
     }
 
     appRef.current.scrollTo(0, 0)
-    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.deposit(data,
         (response) => {
-          console.log('onSucces', response)
+          console.log('onSucces Deposit', response)
           setLoading(false)
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
-            setIsModal(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-              setIsModal(false)
-            }
-            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
-              showErrorMessage(error)
-              setIsModal(false)
-            }
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
+            showErrorMessage(error)
+          } 
+
           console.log('onError deposit', error)
           setLoading(false)
         }
@@ -355,32 +344,27 @@ function App() {
     }
 
     const data = {
-      amount: env === 'sandbox' ? Number(withdrawMoney) : 10000
+      amount: env === 'sandbox' ? Number(withdrawMoney) : 10000,
+      closeWhenDone: true
     }
 
     appRef.current.scrollTo(0, 0)
-    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.withdraw(data,
         (response) => {
-          console.log('onSucces', response)
+          console.log('onSucces Withdraw', response)
           setLoading(false)
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
-            setIsModal(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-              setIsModal(false)
-            }
-            if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
-              showErrorMessage(error)
-              setIsModal(false)
-            }
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
+            showErrorMessage(error)
           }
+
           console.log('onError withdraw', error)
           setLoading(false)
         }
@@ -401,27 +385,21 @@ function App() {
     }
 
     appRef.current.scrollTo(0, 0)
-    setIsModal(true)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.pay(data,
         (response) => {
-          console.log('onSucces', response)
+          console.log('onSucces Pay', response)
           setLoading(false)
         },
         (error) => {
+          console.log('mmm', error)
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
-            setIsModal(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-              setIsModal(false)
-            }
-            if (error?.code === ERROR_CODE.NOT_LOGIN) {
-              showErrorMessage(error)
-              setIsModal(false)
-            }
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
+            showErrorMessage(error)
           }
           setLoading(false)
           console.log('error pay', error);
@@ -697,20 +675,21 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: 2021-05-10</p>
+              <p>Version: 2021-05-20</p>
             </div>
           </>
         )}
-        <div style={{display: isModal ? 'block' : 'none'}} className='modal'>
-          <WebPaymeSDK ref={refPaymeSDK} propStyle={{
-            maxWidth: 500,
-            height: (isDesktop || isTablet) ? '90%' : '100%',
+        <WebPaymeSDK 
+          ref={refPaymeSDK} 
+          propStyle={{
+            width: 500,
+            height: '100%',
             overflow: 'hidden',
-            paddingTop: (isDesktop || isTablet) ? '5%' : '0%',
             margin: 'auto',
             alignSelf: 'center'
-          }} />
-        </div>
+          }} 
+          overlayBackground
+        />
       </div>
       <LoadingWeb loading={loading} />
     </>
