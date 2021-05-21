@@ -11,6 +11,7 @@ import { Images } from './image';
 import { LoadingWeb } from './component/Loading';
 import { encrypt } from './helper/genConnectToken';
 import ClickNHold from './component/ClickMultiple';
+import { useMediaQuery } from 'react-responsive';
 
 const ERROR_CODE = {
   EXPIRED: 401,
@@ -94,6 +95,9 @@ let CONFIGS = {
 
 
 function App() {
+  const isDesktop = useMediaQuery({ minWidth: 992 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 })
+
   const refPaymeSDK = useRef(null)
   const appRef = useRef(null)
   const [env, setEnv] = useState("sandbox")
@@ -688,7 +692,7 @@ function App() {
         <WebPaymeSDK 
           ref={refPaymeSDK} 
           propStyle={{
-            width: 500,
+            width: (isDesktop || isTablet) ? 500 : '100%',
             height: '100%',
             overflow: 'hidden',
             margin: 'auto',
