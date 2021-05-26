@@ -718,7 +718,7 @@ function App() {
                       options={listService}
                       onChange={onSelectService}
                       // value={defaultOption}
-                      placeholder="Select an service"
+                      placeholder="Chọn dịch vụ"
                     />
                   </div>
                 )}
