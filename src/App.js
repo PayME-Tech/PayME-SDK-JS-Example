@@ -129,6 +129,9 @@ function App() {
     'dev', 'sandbox'
   ])
 
+  const [listService, setListService] = useState([])
+  const [serviceCode, setServiceCode] = useState('')
+
   const defaultOption = options[1];
 
   useEffect(() => {
@@ -324,9 +327,6 @@ function App() {
         (response) => {
           console.log('onSucces Deposit', response)
           setLoading(false)
-          if (response?.type === 'onDeposit') {
-            setIsModal(false)
-          }
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
@@ -362,9 +362,6 @@ function App() {
         (response) => {
           console.log('onSucces Withdraw', response)
           setLoading(false)
-          if (response?.type === 'onWithdraw') {
-            setIsModal(false)
-          }
         },
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
@@ -422,6 +419,12 @@ function App() {
     setLoading(true)
     refPaymeSDK.current?.getListService(
       (response) => {
+        setListService(response?.data?.filter((item) => item.enable).map((item) => {
+          return {
+            value: item.code,
+            label: item.description
+          }
+        }))
         alert(JSON.stringify(response.data))
         setLoading(false);
       },
@@ -454,11 +457,32 @@ function App() {
     )
   }
 
-  // const openService = () => {
-  //   refPaymeSDK.current?.openService(data => {
-  //     alert(JSON.stringify(data))
-  //   })
-  // }
+  const openService = () => {
+    if(serviceCode) {
+      refPaymeSDK.current?.openService(
+        serviceCode,
+        (response) => {
+          console.log('onSucces openService', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            showErrorMessage(error)
+          }
+          setLoading(false)
+          console.log('onError openService', error)
+        }
+      )
+    } else {
+      alert('Vui lòng chọn dịch vụ!')
+    }
+    
+  }
 
   const getListPaymentMethod = () => {
     setLoading(true)
@@ -481,6 +505,10 @@ function App() {
   const onSelect = (selected) => {
     setEnv(selected.value)
     handleChangeEnv(selected.value)
+  }
+
+  const onSelectService = (selected) => {
+    setServiceCode(selected.value)
   }
 
   const handleChangeUserId = (event) => {
@@ -682,6 +710,18 @@ function App() {
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListService()}>Get List Service</button>
+
+                {listService.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => openService()}>Open Service</button>
+                    <Dropdown
+                      options={listService}
+                      onChange={onSelectService}
+                      // value={defaultOption}
+                      placeholder="Select an service"
+                    />
+                  </div>
+                )}
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
