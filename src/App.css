@@ -29,6 +29,10 @@
   /* Black w/ opacity */
 }
 
+.dropbox {
+  width: 150px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

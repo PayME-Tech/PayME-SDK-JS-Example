@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import WebPaymeSDK from 'web-payme-sdk';
 // import WebPaymeSDK from './PaymeSDK';
-
-import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
+import Select from 'react-select';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Images } from './image';
@@ -70,6 +68,27 @@ let CONFIGS = {
     appId: "14",
     storeId: 24088141
   },
+  staging: {
+    appToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
+    publicKey: `-----BEGIN PUBLIC KEY-----
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
+UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
+-----END PUBLIC KEY-----`,
+    privateKey: `-----BEGIN RSA PRIVATE KEY-----
+MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
+yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
+5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
+AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
+ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
+xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
+A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
+-----END RSA PRIVATE KEY-----`,
+    env: "STAGING",
+    secretKey: "bda4d9de88f37efb93342d8764ac9b84",
+    appId: "7",
+    storeId: 25092940
+  },
   dev: {
     appToken:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTIsImlhdCI6MTYyMDg4MjQ2NH0.DJfi52Dc66IETflV2dQ8G_q4oUAVw_eG4TzrqkL0jLU",
@@ -127,7 +146,8 @@ function App() {
   const [loading, setLoading] = useState(false)
 
   const [options, setOptions] = useState([
-    'dev', 'sandbox'
+    { value: 'dev', label: 'dev' },
+    { value: 'sandbox', label: 'sandbox' }
   ])
 
   const [listService, setListService] = useState([])
@@ -520,8 +540,12 @@ function App() {
   }
 
   const getListPaymentMethod = () => {
+    const data = {
+      storeId: CONFIGS[env].storeId
+    }
     setLoading(true)
     refPaymeSDK.current?.getListPaymentMethod(
+      data,
       (response) => {
         alert(JSON.stringify(response))
         setLoading(false)
@@ -652,11 +676,12 @@ function App() {
             <p>Enviroment</p>
           </ClickNHold>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <Dropdown
+            <Select
               options={options}
               onChange={onSelect}
-              value={defaultOption}
+              defaultValue={defaultOption}
               placeholder="Select an option"
+              className='dropbox'
             />
             <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setIsSettings(!isSettings)} onKeyPress={() => setIsSettings(!isSettings)}>
               <img style={{ marginLeft: 12 }} src={isSettings ? Images.leftArrow : Images.settings} alt="" />
@@ -761,11 +786,12 @@ function App() {
                 {listService.length > 0 && (
                   <div style={{ marginTop: 12, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => openService()}>Open Service</button>
-                    <Dropdown
+                    <Select
                       options={listService}
                       onChange={onSelectService}
                       // value={defaultOption}
                       placeholder="Chọn dịch vụ"
+                      className='dropbox'
                     />
                   </div>
                 )}
