@@ -116,6 +116,7 @@ function App() {
   const [payMoney, setPayMoney] = useState('10000')
   const [depositMoney, setDepositMoney] = useState('10000')
   const [withdrawMoney, setWithdrawMoney] = useState('10000')
+  const [transferMoney, setTransferMoney] = useState('10000')
 
   const [isSettings, setIsSettings] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
@@ -336,7 +337,7 @@ function App() {
           }
           else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
             showErrorMessage(error)
-          } 
+          }
 
           console.log('onError deposit', error)
           setLoading(false)
@@ -373,6 +374,41 @@ function App() {
           }
 
           console.log('onError withdraw', error)
+          setLoading(false)
+        }
+      )
+    }, 100)
+  }
+
+  const transfer = (param) => {
+    if (!checkMoney(transferMoney)) {
+      return
+    }
+
+    const data = {
+      amount: env === 'sandbox' ? Number(transferMoney) : 10000,
+      description: 'Chuyển tiền',
+      closeWhenDone: true
+    }
+
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.transfer(data,
+        (response) => {
+          console.log('onSucces Transfer', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_KYC || error?.code === ERROR_CODE.NOT_ACTIVED) {
+            showErrorMessage(error)
+          }
+
+          console.log('onError Transfer', error)
           setLoading(false)
         }
       )
@@ -458,7 +494,11 @@ function App() {
   }
 
   const openService = () => {
+<<<<<<< HEAD
     if(serviceCode) {
+=======
+    if (serviceCode) {
+>>>>>>> 69a4ea1... Update hàm Chuyển
       refPaymeSDK.current?.openService(
         serviceCode,
         (response) => {
@@ -481,7 +521,10 @@ function App() {
     } else {
       alert('Vui lòng chọn dịch vụ!')
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> 69a4ea1... Update hàm Chuyển
   }
 
   const getListPaymentMethod = () => {
@@ -537,6 +580,13 @@ function App() {
       ? event.target.value
       : withdrawMoney
     setWithdrawMoney(withdrawMoneyValid)
+  }
+
+  const handleChangeTransferMoney = (event) => {
+    const depositMoneyValid = event.target.validity.valid
+      ? event.target.value
+      : depositMoney
+    setTransferMoney(depositMoneyValid)
   }
 
   const handleChangePayMoney = (event) => {
@@ -700,6 +750,11 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={withdrawMoney} onChange={handleChangeWithdrawMoney} />
                 </div>
 
+                <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => transfer()}>Chuyển tiền ví</button>
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
@@ -729,15 +784,15 @@ function App() {
             </div>
           </>
         )}
-        <WebPaymeSDK 
-          ref={refPaymeSDK} 
+        <WebPaymeSDK
+          ref={refPaymeSDK}
           propStyle={{
             width: (isDesktop || isTablet) ? 500 : '100%',
             height: '100%',
             overflow: 'hidden',
             margin: 'auto',
             alignSelf: 'center'
-          }} 
+          }}
           overlayBackground
         />
       </div>
