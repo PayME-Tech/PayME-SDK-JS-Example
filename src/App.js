@@ -494,11 +494,7 @@ function App() {
   }
 
   const openService = () => {
-<<<<<<< HEAD
-    if(serviceCode) {
-=======
     if (serviceCode) {
->>>>>>> 69a4ea1... Update hàm Chuyển
       refPaymeSDK.current?.openService(
         serviceCode,
         (response) => {
@@ -521,10 +517,6 @@ function App() {
     } else {
       alert('Vui lòng chọn dịch vụ!')
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> 69a4ea1... Update hàm Chuyển
   }
 
   const getListPaymentMethod = () => {
