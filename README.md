@@ -266,7 +266,9 @@ refWebPaymeSDK.current.openService(
 Hàm này được gọi khi từ app tích hợp khi muốn lấy danh sách các phương thức thanh toán mà PayME cung cấp vs từng tài khoản sau khi tài khoản đã kích hoạt và định danh thành công, dùng để truyền vào hàm pay() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn
 ```javascript
 refWebPaymeSDK.current.getListPaymentMethod(
-   storeId,
+   { 
+      storeId
+   },
    (response) => {
       // onSuccess
    },
