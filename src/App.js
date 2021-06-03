@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-// import WebPaymeSDK from 'web-payme-sdk';
-import WebPaymeSDK from './PaymeSDK';
+import WebPaymeSDK from 'web-payme-sdk';
+// import WebPaymeSDK from './PaymeSDK';
 import Select from 'react-select';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
@@ -133,6 +133,8 @@ function App() {
   const [secretKey, setSecretKey] = useState(CONFIGS[env].secretKey)
 
   const [payMoney, setPayMoney] = useState('10000')
+  const [payWithMethodMoney, setPayWithMethodMoney] = useState('10000')
+
   const [depositMoney, setDepositMoney] = useState('10000')
   const [withdrawMoney, setWithdrawMoney] = useState('10000')
   const [transferMoney, setTransferMoney] = useState('10000')
@@ -202,7 +204,7 @@ function App() {
     setIsLogin(false)
   }
 
-  const checkMoney = (money, type) => {
+  const checkMoney = (money) => {
     const m = Number(money)
     if (m < 10000) {
       alert("Vui lòng nhập số tiền lớn hơn 10,000 đ.")
@@ -457,8 +459,7 @@ function App() {
   }
 
   const pay = () => {
-    console.log('method?.value', method?.value)
-    if (!checkMoney(payMoney, 'PAY')) {
+    if (!checkMoney(payMoney)) {
       return
     }
 
@@ -466,8 +467,7 @@ function App() {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
-      note: "note",
-      method: method?.value
+      note: "note"
     }
 
     appRef.current.scrollTo(0, 0)
@@ -488,6 +488,42 @@ function App() {
           }
           setLoading(false)
           console.log('error pay', error);
+        }
+      )
+    }, 100)
+  }
+
+  const payWithMethod = () => {
+    if (!checkMoney(payWithMethodMoney)) {
+      return
+    }
+
+    const data = {
+      amount: env === 'sandbox' ? Number(payWithMethodMoney) : 10000,
+      orderId: Date.now().toString(),
+      storeId: CONFIGS[env].storeId,
+      note: "note",
+      method: method?.value
+    }
+
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.pay(data,
+        (response) => {
+          console.log('onSucces payWithMethod', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
+            showErrorMessage(error)
+          }
+          setLoading(false)
+          console.log('error payWithMethod', error);
         }
       )
     }, 100)
@@ -599,7 +635,6 @@ function App() {
   }
 
   const onSelectMethod = (selected) => {
-    console.log('selected', selected)
     setMethod(selected)
   }
 
@@ -644,6 +679,14 @@ function App() {
       : payMoney
     setPayMoney(payMoneyValid)
   }
+
+  const handleChangePayWithMethodMoney = (event) => {
+    const payMoneyValid = event.target.validity.valid
+      ? event.target.value
+      : payWithMethodMoney
+    setPayWithMethodMoney(payMoneyValid)
+  }
+
 
   const handleChangeAppID = (event) => {
     setAppID(event.target.value)
@@ -699,6 +742,15 @@ function App() {
       setOptions([...options, { value: 'production', label: 'production' }])
     }
   }
+
+  const isMobileStyle = (isDesktop || isTablet) ? {
+    height: '80%',
+    width: 500,
+    top: '50%',
+    left: '50%',
+    position:'absolute',
+    transform: 'translate(-50%, -50%)',
+  } : {}
 
   return (
     <>
@@ -812,7 +864,7 @@ function App() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => pay()}>Pay with method</button>
+                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay with method</button>
                   <Select
                     options={listMethod}
                     onChange={onSelectMethod}
@@ -820,8 +872,7 @@ function App() {
                     placeholder="Chọn phương thức"
                     className='dropbox'
                   />
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payWithMethodMoney} onChange={handleChangePayWithMethodMoney} />
                 </div>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListPaymentMethod()}>Get List Payment Method</button>
@@ -852,11 +903,12 @@ function App() {
         <WebPaymeSDK
           ref={refPaymeSDK}
           propStyle={{
-            width: (isDesktop || isTablet) ? 500 : '100%',
+            width: '100%',
             height: '100%',
             overflow: 'hidden',
             margin: 'auto',
-            alignSelf: 'center'
+            alignSelf: 'center',
+            ...isMobileStyle
           }}
           overlayBackground
         />
