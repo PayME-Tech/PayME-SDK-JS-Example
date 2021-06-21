@@ -147,6 +147,8 @@ function App() {
 
   const [loading, setLoading] = useState(false)
 
+  const [configs, setConfigs] = useState({})
+
   const [options, setOptions] = useState([
     { value: 'dev', label: 'dev' },
     { value: 'sandbox', label: 'sandbox' }
@@ -183,6 +185,23 @@ function App() {
       setDeviceId(visitorId)
     })();
   }, [])
+
+  useEffect(() => {
+    setConfigs({
+      appToken,
+      deviceId,
+      env,
+      partner: {
+        type: "web"
+      },
+      showLog: showLog ? "1" : "0",
+      configColor: ["#4430b3", "#6756d6"],
+      publicKey: publicKey,
+      privateKey: privateKey,
+      appId: appID,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceId, appID, appToken, publicKey, privateKey, env, showLog])
 
   const checkUserId = () => {
     if (userId === '') {
@@ -224,29 +243,19 @@ function App() {
     resetState()
     try {
       const connectToken = encrypt(JSON.stringify({ userId, timestamp: Date.now(), phone: phoneNumber }), secretKey)
-      const configs = {
+      const configsLogin = {
+        ...configs,
         connectToken,
-        appToken,
-        deviceId,
-        env,
-        partner: {
-          type: "web",
-          paddingTop: 20,
-        },
-        showLog: showLog ? "1" : "0",
-        // configColor: ["#00ffff", "#ff0000"],
-        publicKey: publicKey,
-        privateKey: privateKey,
-        appId: appID,
         phone: phoneNumber ?? ''
       }
 
-      refPaymeSDK.current?.login(configs,
+      refPaymeSDK.current?.login(configsLogin,
         (respone) => {
           console.log('respone login', respone);
           // alert('Login thành công')
           setIsLogin(true);
           getBalance();
+          // getListPaymentMethod()
           // setLoading(false);
         },
         (error) => {
@@ -273,7 +282,6 @@ function App() {
     setPhoneNumber("")
     setIsLogin(false)
   }
-
 
   const handleChangeEnv = (env) => {
     setAppID(CONFIGS[env].appId)
@@ -340,7 +348,7 @@ function App() {
     refPaymeSDK.current?.getBalance(
       (response) => {
         setLoading(false)
-        setBalance(response?.data?.balance ?? 0)
+        setBalance(response?.balance ?? 0)
       },
       (error) => {
         if (error?.code === ERROR_CODE.EXPIRED) {
@@ -462,12 +470,24 @@ function App() {
     if (!checkMoney(payMoney)) {
       return
     }
-
     const data = {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
-      note: "note"
+      note: "note",
+      configs: {
+        appToken,
+        deviceId,
+        env,
+        partner: {
+          type: "web"
+        },
+        showLog: showLog ? "1" : "0",
+        configColor: ["#4430b3", "#6756d6"],
+        publicKey: publicKey,
+        privateKey: privateKey,
+        appId: appID,
+      }
     }
 
     appRef.current.scrollTo(0, 0)
@@ -533,13 +553,13 @@ function App() {
     setLoading(true)
     refPaymeSDK.current?.getListService(
       (response) => {
-        setListService(response?.data?.filter((item) => item.enable).map((item) => {
+        setListService(response?.filter((item) => item.enable).map((item) => {
           return {
             value: item.code,
             label: item.description
           }
         }))
-        alert(JSON.stringify(response.data))
+        alert(JSON.stringify(response))
         setLoading(false);
       },
       (error) => {
@@ -605,7 +625,7 @@ function App() {
     refPaymeSDK.current?.getListPaymentMethod(
       data,
       (response) => {
-        setListMethod(response?.data?.map((item) => {
+        setListMethod(response?.map((item) => {
           return {
             value: item,
             label: item.title
@@ -748,7 +768,7 @@ function App() {
     width: 500,
     top: '50%',
     left: '50%',
-    position:'absolute',
+    position: 'absolute',
     transform: 'translate(-50%, -50%)',
   } : {}
 
@@ -829,6 +849,16 @@ function App() {
               <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => logout()}>Logout</button>
             </div>
 
+            <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px 16px', padding: '0px 16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <p>Chức năng không cần login</p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
+                <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
+              </div>
+            </div>
+
             {isLogin && (
               <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '0px   16px' }}>
 
@@ -858,11 +888,6 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-                </div>
-
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay with method</button>
                   <Select
@@ -870,9 +895,10 @@ function App() {
                     onChange={onSelectMethod}
                     // value={defaultOption}
                     placeholder="Chọn phương thức"
-                    className='dropbox'
+                    className='dropdownPay'
+
                   />
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payWithMethodMoney} onChange={handleChangePayWithMethodMoney} />
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payWithMethodMoney} onChange={handleChangePayWithMethodMoney} />
                 </div>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListPaymentMethod()}>Get List Payment Method</button>
@@ -896,12 +922,13 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: 2021-05-28</p>
+              <p>Version: 2021-06-09</p>
             </div>
           </>
         )}
         <WebPaymeSDK
           ref={refPaymeSDK}
+          config={configs}
           propStyle={{
             width: '100%',
             height: '100%',

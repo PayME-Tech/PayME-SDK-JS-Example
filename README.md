@@ -46,17 +46,53 @@ import WebPaymeSDK from 'web-payme-sdk'
 
 class Example extends Component {
   const refWebPaymeSDK = useRef(null)
+  const configs = {
+      appToken,
+      deviceId,
+      publicKey,
+      privateKey,
+      env, 
+      appId,
+      partner,
+      configColor
+   }
   render() {
-    return <WebPaymeSDK ref={refWebPaymeSDK} propStyle={propStyle} />
+    return <WebPaymeSDK configs={configs} ref={refWebPaymeSDK} propStyle={propStyle} />
   }
 }
 ```
 
 #### Parameters
-| Property | Type | Description |
-| -------------- | ---------- | ------------------------------------------------------------ |
-| `propStyle` | `object` | Custom style cho component |
+| Property | Type | Required | Description |
+| -------------- | ---------- | -------- |  ------------------------------------------------------------ |
+| `propStyle` | `object` | No | Custom style cho component |
+| `appToken` | `string` | Yes | AppId cấp riêng định danh cho mỗi app, cần truyền cho SDK để mã hóa. |
+| `publicKey` | `string` | Yes | Dùng để mã hóa dữ liệu, app tích hợp cần truyền cho SDK để mã hóa. Do hệ thống PayME cung cấp cho app tích hợp. |
+| `privateKey` | `string` | Yes | app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
+| `deviceId` | `string` |Yes | Là deviceId của thiết bị |
+| `env` | `string` | Yes |Là môi trường sử dụng SDK (sandbox, production) |
+| `appId` | `string` | Yes |Là appID khi đăng ký merchant sdk sẽ được hệ thống tạo cho |
+| `partner` | `object` | Yes | <pre lang="json">{<br>   paddingTop: Tùy biến vị trí góc trên cùng khi thiết bị trên app có tùy biến header-statusbar<br>}</pre> |
+| `configColor` | `string[]` | Yes | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. | 
 
+[![img](https://github.com/PayME-Tech/PayME-SDK-Android-Example/raw/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)](https://github.com/PayME-Tech/PayME-SDK-Android-Example/blob/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)
+
+
+### Mã lỗi của PayME SDK
+| Hằng số | Mã lỗi | Giải thích 
+| -------------- | ---------- | -------- |
+| `EXPIRED` | `401` | token hết hạn sử dụng |
+| `NETWORK` | `-1` |  Kết nối mạng bị sự cố |
+| `SYSTEM` | `-2` |  Lỗi hệ thống |
+| `LIMIT` | `-3` |  app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
+| `NOT_ACTIVED` | `-4` | Lỗi tài khoản chưa kích hoạt |
+| `NOT_KYC` | `-5` | Lỗi tài khoản chưa định danh |
+| `PAYMENT_ERROR` | `-6` | Thanh toán thất bại |
+| `ERROR_KEY_ENCODE` | `-7` | Lỗi mã hóa/giải mã dữ liệu |
+| `USER_CANCELLED` | `-8` | Người dùng thao tác hủy | 
+| `NOT_LOGIN` | `-9` | Lỗi tài khoản chưa login | 
+| `CLOSE_IFRAME` | `-10` | Đóng Iframe | 
+| `BALANCE_ERROR` | `-11` | Lỗi số dư ví không đủ |
 
 ### Các chức năng của PayME SDK
 
@@ -69,20 +105,16 @@ Có 2 trường hợp
     
 Sau khi gọi login() thành công rồi thì mới gọi các chức năng khác của SDK ( openWallet, pay, ... )
 
+Có thể sử dụng hàm pay khi chưa login để sử dụng 1 số phương thức được hỗ trợ
+
 ```javascript
-const configs = {
+const configsLogin = {
+   ...configs,
    connectToken,
-   appToken,
-   deviceId,
-   env,
-   configColor,
-   publicKey,
-   privateKey,
-   appId,
    phone
 }
 refWebPaymeSDK.current.login(
-   configs,
+   configsLogin,
    (response) => {
       // onSuccess
    },
@@ -101,18 +133,8 @@ refWebPaymeSDK.current.login(
 #### Parameters
 | Property | Type | Description |
 | -------------- | ---------- | ------------------------------------------------------------ |
-| `appToken` | `string` | AppId cấp riêng định danh cho mỗi app, cần truyền cho SDK để mã hóa. |
-| `publicKey` | `string` | Dùng để mã hóa dữ liệu, app tích hợp cần truyền cho SDK để mã hóa. Do hệ thống PayME cung cấp cho app tích hợp. |
-| `privateKey` | `string` | app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
 | `connectToken` | `string` | app cần truyền giá trị được cung cấp ở trên, xem cách tạo bên dưới. |
-| `deviceId` | `string` | Là deviceId của thiết bị |
-| `env` | `string` | Là môi trường sử dụng SDK (sandbox, production) |
-| `appId` | `string` | Là appID khi đăng ký merchant sdk sẽ được hệ thống tạo cho |
 | `phone` | `string` | Số điện thoại của hệ thống tích hợp |
-| `partner` | `object` | <pre lang="json">{<br>   paddingTop: Tùy biến vị trí góc trên cùng khi thiết bị trên app có tùy biến header-statusbar<br>}</pre> |
-| `configColor` | `string[]` | configColor : là tham số màu để có thể thay đổi màu sắc giao dịch ví PayME, kiểu dữ liệu là chuỗi với định dạng #rrggbb. Nếu như truyền 2 màu thì giao diện PayME sẽ gradient theo 2 màu truyền vào. |
-
-[![img](https://github.com/PayME-Tech/PayME-SDK-Android-Example/raw/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)](https://github.com/PayME-Tech/PayME-SDK-Android-Example/blob/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)
 
 Cách tạo **connectToken**:
 connectToken cần để truyền gọi api từ tới PayME và sẽ được tạo từ hệ thống backend của app tích hợp. Cấu trúc như sau:
