@@ -147,7 +147,19 @@ function App() {
 
   const [loading, setLoading] = useState(false)
 
-  const [configs, setConfigs] = useState({})
+  const [configs, setConfigs] = useState({
+    appToken,
+    deviceId,
+    env,
+    partner: {
+      type: "web"
+    },
+    showLog: showLog ? "1" : "0",
+    configColor: ["#4430b3", "#6756d6"],
+    publicKey: publicKey,
+    privateKey: privateKey,
+    appId: appID,
+  })
 
   const [options, setOptions] = useState([
     { value: 'dev', label: 'dev' },
@@ -281,6 +293,19 @@ function App() {
     setUserId("")
     setPhoneNumber("")
     setIsLogin(false)
+    setConfigs({
+      appToken,
+      deviceId,
+      env,
+      partner: {
+        type: "web"
+      },
+      showLog: showLog ? "1" : "0",
+      configColor: ["#4430b3", "#6756d6"],
+      publicKey: publicKey,
+      privateKey: privateKey,
+      appId: appID,
+    })
   }
 
   const handleChangeEnv = (env) => {
