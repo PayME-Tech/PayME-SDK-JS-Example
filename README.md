@@ -39,6 +39,7 @@ Chuẩn mã hóa: RSA-512bit.
 
 ### Khởi tạo thư viện
 Trước khi sử dụng PayME SDK cần import component SDK và ref để sử dụng các chức năng.
+- Khi sử dụng tài khoản khác cần cập nhật lại param configs
 
 ```javascript
 import React, { Component, useRef } from 'react'
