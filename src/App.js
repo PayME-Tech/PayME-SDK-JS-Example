@@ -369,6 +369,27 @@ function App() {
     }, 100)
   }
 
+  const scanQR = () => {
+    refPaymeSDK.current?.scanQR(
+      (response) => {
+        console.log('onSucces scanQR', response)
+        setLoading(false)
+      },
+      (error) => {
+        if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+          setIsOpen(false)
+        } else {
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          }
+          showErrorMessage(error)
+        }
+        setLoading(false)
+        console.log('onError scanQR', error)
+      }
+    )
+  }
+
   const getBalance = () => {
     refPaymeSDK.current?.getBalance(
       (response) => {
@@ -499,26 +520,41 @@ function App() {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
-      note: "note",
-      configs: {
-        appToken,
-        deviceId,
-        env,
-        partner: {
-          type: "web"
-        },
-        showLog: showLog ? "1" : "0",
-        configColor: ["#4430b3", "#6756d6"],
-        publicKey: publicKey,
-        privateKey: privateKey,
-        appId: appID,
-      }
+      note: "note"
     }
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
       setIsOpen(true)
       refPaymeSDK.current?.pay(data,
+        (response) => {
+          console.log('onSucces Pay', response)
+          setLoading(false)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
+            showErrorMessage(error)
+          }
+          setLoading(false)
+          console.log('error pay', error);
+        }
+      )
+    }, 100)
+  }
+
+  const payQRString = () => {
+    const data = {
+      qrContent: "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
+    }
+
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.payQRString(data,
         (response) => {
           console.log('onSucces Pay', response)
           setLoading(false)
@@ -882,6 +918,12 @@ function App() {
                 <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
                 <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
               </div>
+
+              <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => payQRString()}>Pay QRSring</button>
+              </div>
+
+              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
             </div>
 
             {isLogin && (
@@ -947,7 +989,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk">web-payme-sdk 1.2.6</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk">web-payme-sdk 1.2.7</a></p>
             </div>
           </>
         )}

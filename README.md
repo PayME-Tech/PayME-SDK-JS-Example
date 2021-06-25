@@ -186,6 +186,59 @@ refWebPaymeSDK.current.openWallet(
    }
 )
 ```
+
+#### scanQR
+Mở chức năng quét mã QR để thanh toán
+```javascript
+refWebPaymeSDK.current.scanQR(
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
+)
+```
+
+Định dạng QR: 
+```javascript
+const qrString = "{$type}|${storeId}|${action}|${amount}|${note}|${orderId}"
+``` 
+- action: loại giao dịch ( 'PAYMENT' => thanh toán)
+- amount: số tiền thanh toán
+- note: Mô tả giao dịch từ phía đối tác
+- orderId: mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch
+- storeId: ID của store phía công thanh toán thực hiên giao dịch thanh toán
+- type: OPENEWALLET
+
+Ví dụ :
+```javascript
+const qrString = "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
+```
+
+#### payQRCode
+Hàm dùng để thanh toán mã QR code do đối tác cung cấp
+```javascript
+refWebPaymeSDK.current.payQRCode(
+   {
+      qrContent: String,
+      isShowResultUI: Boolean
+   },
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
+)
+```
+| **Tham số** | **Bắt buộc** | **Giải thích** |
+| :----------------------------------------------------------- | :----------- | :----------------------------------------------------------- |
+| qrContent | Yes| Nội dung QR Code |
+| isShowResultUI | No | Option hiển thị UI kết quả thanh toán. Default: true |
+| onSuccess | Yes | Dùng để bắt callback khi thực hiện giao dịch thành công từ PayME SDK |
+| onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
+
 #### deposit - Nạp tiền
 ```javascript
 refWebPaymeSDK.current?.deposit(
