@@ -989,7 +989,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk">web-payme-sdk 1.2.7</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk">web-payme-sdk 1.2.8</a></p>
             </div>
           </>
         )}
