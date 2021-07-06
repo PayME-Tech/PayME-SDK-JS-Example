@@ -106,8 +106,6 @@ Có 2 trường hợp
     
 Sau khi gọi login() thành công rồi thì mới gọi các chức năng khác của SDK ( openWallet, pay, ... )
 
-Có thể sử dụng hàm pay khi chưa login để sử dụng 1 số phương thức được hỗ trợ
-
 ```javascript
 const configsLogin = {
    ...configs,

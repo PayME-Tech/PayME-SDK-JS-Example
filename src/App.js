@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import WebPaymeSDK from 'web-payme-sdk';
-// import WebPaymeSDK from './PaymeSDK';
+import WebPaymeSDK, { LANGUAGES } from 'web-payme-sdk';
+// import WebPaymeSDK, { LANGUAGES } from './PaymeSDK';
 import Select from 'react-select';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
@@ -121,6 +121,7 @@ function App() {
   const appRef = useRef(null)
   const [env, setEnv] = useState("sandbox")
   const [deviceId, setDeviceId] = useState('')
+  const [lang, setLang] = useState('vi')
 
   const [userId, setUserId] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -133,6 +134,7 @@ function App() {
   const [secretKey, setSecretKey] = useState(CONFIGS[env].secretKey)
 
   const [payMoney, setPayMoney] = useState('10000')
+  const [payQRCode, setPayQRCode] = useState('OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323')
   const [payWithMethodMoney, setPayWithMethodMoney] = useState('10000')
 
   const [depositMoney, setDepositMoney] = useState('10000')
@@ -166,6 +168,11 @@ function App() {
     { value: 'sandbox', label: 'sandbox' }
   ])
 
+  const optionsLang = [
+    { value: LANGUAGES.VI, label: 'Tiếng Việt' },
+    { value: LANGUAGES.EN, label: 'Tiếng Anh' }
+  ]
+
   const [listService, setListService] = useState([])
   const [listMethod, setListMethod] = useState([])
 
@@ -173,6 +180,7 @@ function App() {
   const [method, setMethod] = useState({})
 
   const defaultOption = options[1];
+  const defaultOptionLang = optionsLang[0];
 
   useEffect(() => {
     /* iOS re-orientation fix */
@@ -203,6 +211,7 @@ function App() {
       appToken,
       deviceId,
       env,
+      lang: lang,
       partner: {
         type: "web"
       },
@@ -213,7 +222,7 @@ function App() {
       appId: appID,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deviceId, appID, appToken, publicKey, privateKey, env, showLog])
+  }, [deviceId, appID, appToken, publicKey, privateKey, env, showLog, lang])
 
   const checkUserId = () => {
     if (userId === '') {
@@ -546,15 +555,15 @@ function App() {
     }, 100)
   }
 
-  const payQRString = () => {
+  const onPayQRCode = () => {
     const data = {
-      qrContent: "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
+      qrContent: payQRCode
     }
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
       setIsOpen(true)
-      refPaymeSDK.current?.payQRString(data,
+      refPaymeSDK.current?.payQRCode(data,
         (response) => {
           console.log('onSucces Pay', response)
           setLoading(false)
@@ -711,6 +720,10 @@ function App() {
     handleChangeEnv(selected.value)
   }
 
+  const onSelectLang = (selected) => {
+    setLang(selected.value)
+  }
+
   const onSelectService = (selected) => {
     setServiceCode(selected.value)
   }
@@ -759,6 +772,10 @@ function App() {
       ? event.target.value
       : payMoney
     setPayMoney(payMoneyValid)
+  }
+
+  const handlePayQRCode = (event) => {
+    setPayQRCode(event.target.value)
   }
 
   const handleChangePayWithMethodMoney = (event) => {
@@ -836,23 +853,38 @@ function App() {
   return (
     <>
       <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '0px 16px', alignItems: 'center' }}>
-          <ClickNHold
-            time={4}
-            onEnd={onSwitchEnv}>
-            <p>Enviroment</p>
-          </ClickNHold>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <Select
-              options={options}
-              onChange={onSelect}
-              defaultValue={defaultOption}
-              placeholder="Select an option"
-              className='dropbox'
-            />
-            <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setIsSettings(!isSettings)} onKeyPress={() => setIsSettings(!isSettings)}>
-              <img style={{ marginLeft: 12 }} src={isSettings ? Images.leftArrow : Images.settings} alt="" />
+        <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: '16px 0px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <ClickNHold
+                style={{ flex: 1 }}
+                time={4}
+                onEnd={onSwitchEnv}>
+                <p>Enviroment</p>
+              </ClickNHold>
+              <Select
+                options={options}
+                onChange={onSelect}
+                defaultValue={defaultOption}
+                placeholder="Select an option"
+                className='dropbox'
+              />
             </div>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <p style={{ flex: 1 }}>Ngôn ngữ cho SDK</p>
+              <Select
+                options={optionsLang}
+                onChange={onSelectLang}
+                defaultValue={defaultOptionLang}
+                placeholder="Select an option"
+                className='dropbox'
+              // styles={customStyles}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center' }} onClick={() => setIsSettings(!isSettings)} onKeyPress={() => setIsSettings(!isSettings)}>
+            <img style={{ marginLeft: 12 }} src={isSettings ? Images.leftArrow : Images.settings} alt="" />
           </div>
         </div>
 
@@ -897,33 +929,17 @@ function App() {
           <>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>UserId</p>
-              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
+              <input style={{ padding: 8, border: '0.5px solid #cbcbcb' }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>Phone number</p>
-              <input style={{ padding: 8 }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
+              <input style={{ padding: 8, border: '0.5px solid #cbcbcb' }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='number' value={phoneNumber} onChange={handleChangePhoneNumber} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
               <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => login()}>Login</button>
               <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => logout()}>Logout</button>
-            </div>
-
-            <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px 16px', padding: '0px 16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <p>Chức năng không cần login</p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
-                <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-              </div>
-
-              <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => payQRString()}>Pay QRSring</button>
-              </div>
-
-              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
             </div>
 
             {isLogin && (
@@ -954,6 +970,18 @@ function App() {
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => transfer()}>Chuyển tiền ví</button>
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
+                </div>
+
+                <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <input maxLength={9} style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
+                </div>
+
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
 
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay with method</button>
@@ -989,7 +1017,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk">web-payme-sdk 1.2.8</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.2.9</a></p>
             </div>
           </>
         )}
