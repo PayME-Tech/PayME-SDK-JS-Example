@@ -78,7 +78,6 @@ class Example extends Component {
 
 [![img](https://github.com/PayME-Tech/PayME-SDK-Android-Example/raw/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)](https://github.com/PayME-Tech/PayME-SDK-Android-Example/blob/main/fe478f50-e3de-4c58-bd6d-9f77d46ce230.png?raw=true)
 
-
 ### Mã lỗi của PayME SDK
 | Hằng số | Mã lỗi | Giải thích 
 | -------------- | ---------- | -------- |
@@ -93,10 +92,10 @@ class Example extends Component {
 | `USER_CANCELLED` | `-8` | Người dùng thao tác hủy | 
 | `NOT_LOGIN` | `-9` | Lỗi tài khoản chưa login | 
 | `CLOSE_IFRAME` | `-10` | Đóng Iframe | 
-| `BALANCE_ERROR` | `-11` | Lỗi số dư ví không đủ |
+| `BALANCE_ERROR` | `-11` | Lỗi số dư ví không đủ | 
+| `UNKNOWN_PAYCODE` | `-12` | Lỗi thiếu thông tin payCode | 
 
 ### Các chức năng của PayME SDK
-
 #### login()
 Có 2 trường hợp
 
@@ -187,8 +186,14 @@ refWebPaymeSDK.current.openWallet(
 
 #### scanQR
 Mở chức năng quét mã QR để thanh toán
+
+⚠️⚠️⚠️ version 1.4.1 trở đi
+
 ```javascript
 refWebPaymeSDK.current.scanQR(
+   {
+      payCode: String
+   },
    (response) => {
       // onSuccess
    },
@@ -197,6 +202,11 @@ refWebPaymeSDK.current.scanQR(
    }
 )
 ```
+
+| **Tham số** | **Bắt buộc** | **Giải thích** |
+| :----------------------------------------------------------- | :----------- | :----------------------------------------------------------- |
+| payCode | Yes | `PAYME`, `CREDIT`, `ATM`, `MANUAL_BANK` (Xem thêm các phương thức khác ở phía dưới) |
+
 
 Định dạng QR: 
 ```javascript
@@ -216,10 +226,14 @@ const qrString = "OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323"
 
 #### payQRCode
 Hàm dùng để thanh toán mã QR code do đối tác cung cấp
+
+⚠️⚠️⚠️ version 1.4.1 trở đi
+
 ```javascript
 refWebPaymeSDK.current.payQRCode(
    {
       qrContent: String,
+      payCode: String,
       isShowResultUI: Boolean
    },
    (response) => {
@@ -233,6 +247,7 @@ refWebPaymeSDK.current.payQRCode(
 | **Tham số** | **Bắt buộc** | **Giải thích** |
 | :----------------------------------------------------------- | :----------- | :----------------------------------------------------------- |
 | qrContent | Yes| Nội dung QR Code |
+| payCode | Yes | `PAYME`, `CREDIT`, `ATM`, `MANUAL_BANK` (Xem thêm các phương thức khác ở phía dưới) |
 | isShowResultUI | No | Option hiển thị UI kết quả thanh toán. Default: true |
 | onSuccess | Yes | Dùng để bắt callback khi thực hiện giao dịch thành công từ PayME SDK |
 | onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
@@ -363,6 +378,9 @@ Hàm này được dùng khi app cần thanh toán 1 khoản tiền từ ví Pay
 - Khi thanh toán bằng ví PayME thì yêu cầu tài khoản đã kích hoạt,định danh và số dư trong ví phải lớn hơn số tiền thanh toán
 - Thông tin tài khoản lấy qua hàm <code>getAccountInfo()</code>
 - Thông tin số dư lấy qua hàm <code>getWalletInfo()</code>
+
+⚠️⚠️⚠️ version 1.4.1 trở đi
+
 ```javascript
 const  data = {
   amount:  Number,
@@ -370,8 +388,8 @@ const  data = {
   storeId:  Number,
   extractData: String,
   note:  String,
+  payCode: String,
   isShowResultUI: Boolean?,
-  method: Object?
 }
 refWebPaymeSDK.current.pay(
    data,
@@ -390,7 +408,7 @@ refWebPaymeSDK.current.pay(
 | orderId | Yes | Mã giao dịch của đối tác, cần duy nhất trên mỗi giao dịch. |
 | storeId | Yes | ID của store phía cổng thanh toán thực hiên giao dịch thanh toán. |
 | isShowResultUI | No | Option hiển thị UI kết quả thanh toán. Default: true |
-| method | No | (Tùy chọn có thể null) cung cấp ở hàm getPaymentMethods() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn |
+| payCode | Yes | `PAYME`, `CREDIT`, `ATM`, `MANUAL_BANK` (Xem thêm các phương thức khác ở phía dưới) |
 | onSuccess | Yes | Dùng để bắt callback khi thực hiện giao dịch thành công từ PayME SDK |
 | onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
 
@@ -417,6 +435,18 @@ refWebPaymeSDK.current.getWalletInfo(response => {
 *detail.cash*: Tiền có thể dùng.
 
 *detail.lockCash*: Tiền bị lock.
+
+## Danh sách phương thức thanh toán
+| **payCode** | **Phương thức thanh toán** |
+| :------------| :-------------|
+| PAYME  | Thanh toán ví PayME |
+| ATM  | Thanh toán thẻ ATM Nội địa |
+| MANUAL_BANK  | Thanh toán chuyển khoản ngân hàng |
+| VN_PAY  | Thanh toán QR Code ngân hàng |
+| CREDIT  | Thanh toán thẻ tín dụng |
+| MOMO  | Thanh toán ví MoMo |
+| ZALO_PAY  | Thanh toán ví ZaloPay |
+
 
 ## License
 Copyright 2020 @ [PayME](payme.vn)

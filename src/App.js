@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import WebPaymeSDK, { LANGUAGES } from 'web-payme-sdk';
-// import WebPaymeSDK, { LANGUAGES } from './PaymeSDK';
+import WebPaymeSDK, { LANGUAGES, PAY_CODE } from 'web-payme-sdk';
+// import WebPaymeSDK, { LANGUAGES, PAY_CODE } from './PaymeSDK';
 import Select from 'react-select';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Images } from './image';
 import { LoadingWeb } from './component/Loading';
 import { encrypt } from './helper/genConnectToken';
-import ClickNHold from './component/ClickMultiple';
 import { useMediaQuery } from 'react-responsive';
 
 const ERROR_CODE = {
@@ -114,12 +113,12 @@ A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
 
 
 function App() {
+  const env = 'sandbox'
   const isDesktop = useMediaQuery({ minWidth: 992 })
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 })
 
   const refPaymeSDK = useRef(null)
   const appRef = useRef(null)
-  const [env, setEnv] = useState("sandbox")
   const [deviceId, setDeviceId] = useState('')
   const [lang, setLang] = useState('vi')
 
@@ -133,9 +132,8 @@ function App() {
   const [privateKey, setPrivateKey] = useState(CONFIGS[env].privateKey)
   const [secretKey, setSecretKey] = useState(CONFIGS[env].secretKey)
 
+  const [payQRCode, setPayQRCode] = useState('OPENEWALLET|24088141|PAYMENT|20000|Chuyentien|2445562323')
   const [payMoney, setPayMoney] = useState('10000')
-  const [payQRCode, setPayQRCode] = useState('OPENEWALLET|54938607|PAYMENT|20000|Chuyentien|2445562323')
-  const [payWithMethodMoney, setPayWithMethodMoney] = useState('10000')
 
   const [depositMoney, setDepositMoney] = useState('10000')
   const [withdrawMoney, setWithdrawMoney] = useState('10000')
@@ -163,23 +161,17 @@ function App() {
     appId: appID,
   })
 
-  const [options, setOptions] = useState([
-    { value: 'dev', label: 'dev' },
-    { value: 'sandbox', label: 'sandbox' }
-  ])
-
   const optionsLang = [
     { value: LANGUAGES.VI, label: 'Tiếng Việt' },
     { value: LANGUAGES.EN, label: 'Tiếng Anh' }
   ]
 
   const [listService, setListService] = useState([])
-  const [listMethod, setListMethod] = useState([])
+  const listMethod = Object.keys(PAY_CODE).map(key => ({ label: key, value: PAY_CODE[key] }));
 
   const [serviceCode, setServiceCode] = useState('')
-  const [method, setMethod] = useState({})
+  const [payCode, setPayCode] = useState('')
 
-  const defaultOption = options[1];
   const defaultOptionLang = optionsLang[0];
 
   useEffect(() => {
@@ -237,9 +229,8 @@ function App() {
   }
 
   const resetState = () => {
-    setListMethod([])
     setListService([])
-    setMethod({})
+    setPayCode('')
     setServiceCode('')
     setIsLogin(false)
   }
@@ -317,15 +308,6 @@ function App() {
     })
   }
 
-  const handleChangeEnv = (env) => {
-    setAppID(CONFIGS[env].appId)
-    setAppToken(CONFIGS[env].appToken)
-    setPublicKey(CONFIGS[env].publicKey)
-    setPrivateKey(CONFIGS[env].privateKey)
-    setSecretKey(CONFIGS[env].secretKey)
-    setIsLogin(false)
-  }
-
   const handleRestoreDefault = () => {
     setAppID(CONFIGS[env].appId)
     setAppToken(CONFIGS[env].appToken)
@@ -379,7 +361,11 @@ function App() {
   }
 
   const scanQR = () => {
+    const data = {
+      payCode
+    }
     refPaymeSDK.current?.scanQR(
+      data,
       (response) => {
         console.log('onSucces scanQR', response)
         setLoading(false)
@@ -521,43 +507,10 @@ function App() {
     }, 100)
   }
 
-  const pay = () => {
-    if (!checkMoney(payMoney)) {
-      return
-    }
-    const data = {
-      amount: env === 'sandbox' ? Number(payMoney) : 10000,
-      orderId: Date.now().toString(),
-      storeId: CONFIGS[env].storeId,
-      note: "note"
-    }
-
-    appRef.current.scrollTo(0, 0)
-    setTimeout(() => {
-      setIsOpen(true)
-      refPaymeSDK.current?.pay(data,
-        (response) => {
-          console.log('onSucces Pay', response)
-          setLoading(false)
-        },
-        (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
-            logout()
-          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
-            showErrorMessage(error)
-          }
-          setLoading(false)
-          console.log('error pay', error);
-        }
-      )
-    }, 100)
-  }
-
   const onPayQRCode = () => {
     const data = {
-      qrContent: payQRCode
+      qrContent: payQRCode,
+      payCode
     }
 
     appRef.current.scrollTo(0, 0)
@@ -571,9 +524,10 @@ function App() {
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
-            logout()
-          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
             showErrorMessage(error)
           }
           setLoading(false)
@@ -584,16 +538,16 @@ function App() {
   }
 
   const payWithMethod = () => {
-    if (!checkMoney(payWithMethodMoney)) {
+    if (!checkMoney(payMoney)) {
       return
     }
 
     const data = {
-      amount: env === 'sandbox' ? Number(payWithMethodMoney) : 10000,
+      amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
       note: "note",
-      method: method?.value
+      payCode
     }
 
     appRef.current.scrollTo(0, 0)
@@ -607,9 +561,10 @@ function App() {
         (error) => {
           if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
             setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
-            logout()
-          } else if (error?.code === ERROR_CODE.NOT_LOGIN) {
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
             showErrorMessage(error)
           }
           setLoading(false)
@@ -687,39 +642,6 @@ function App() {
     }
   }
 
-  const getListPaymentMethod = () => {
-    const data = {
-      storeId: CONFIGS[env].storeId
-    }
-    setLoading(true)
-    refPaymeSDK.current?.getListPaymentMethod(
-      data,
-      (response) => {
-        setListMethod(response?.map((item) => {
-          return {
-            value: item,
-            label: item.title
-          }
-        }))
-        alert(JSON.stringify(response))
-        setLoading(false)
-      },
-      (error) => {
-        if (error?.code === ERROR_CODE.EXPIRED) {
-          logout()
-        }
-        setLoading(false)
-        console.log('error getListPaymentMethod', error);
-        showErrorMessage(error)
-      }
-    )
-  }
-
-  const onSelect = (selected) => {
-    setEnv(selected.value)
-    handleChangeEnv(selected.value)
-  }
-
   const onSelectLang = (selected) => {
     setLang(selected.value)
   }
@@ -729,7 +651,7 @@ function App() {
   }
 
   const onSelectMethod = (selected) => {
-    setMethod(selected)
+    setPayCode(selected.value)
   }
 
   const handleChangeUserId = (event) => {
@@ -742,7 +664,7 @@ function App() {
   const handleChangePhoneNumber = (event) => {
     const phoneNumberValid = event.target.validity.valid
       ? event.target.value
-      : payMoney
+      : phoneNumber
     setPhoneNumber(phoneNumberValid)
   }
 
@@ -767,22 +689,15 @@ function App() {
     setTransferMoney(depositMoneyValid)
   }
 
+  const handlePayQRCode = (event) => {
+    setPayQRCode(event.target.value)
+  }
+
   const handleChangePayMoney = (event) => {
     const payMoneyValid = event.target.validity.valid
       ? event.target.value
       : payMoney
     setPayMoney(payMoneyValid)
-  }
-
-  const handlePayQRCode = (event) => {
-    setPayQRCode(event.target.value)
-  }
-
-  const handleChangePayWithMethodMoney = (event) => {
-    const payMoneyValid = event.target.validity.valid
-      ? event.target.value
-      : payWithMethodMoney
-    setPayWithMethodMoney(payMoneyValid)
   }
 
 
@@ -810,37 +725,6 @@ function App() {
     setShowLog(event.target.checked)
   }
 
-  const onSwitchEnv = (e, enough) => {
-    if (enough) {
-      console.log('changed')
-      CONFIGS = {
-        ...CONFIGS,
-        production: {
-          appToken:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
-          publicKey: `-----BEGIN PUBLIC KEY-----
-      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
-      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
-      -----END PUBLIC KEY-----`,
-          privateKey: `-----BEGIN RSA PRIVATE KEY-----
-      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
-      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
-      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
-      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
-      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
-      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
-      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
-      -----END RSA PRIVATE KEY-----`,
-          env: "PRODUCTION",
-          secretKey: "bda4d9de88f37efb93342d8764ac9b84",
-          appId: "7",
-          storeId: 25092940
-        },
-      }
-      setOptions([...options, { value: 'production', label: 'production' }])
-    }
-  }
-
   const isMobileStyle = (isDesktop || isTablet) ? {
     height: '80%',
     width: 500,
@@ -855,22 +739,7 @@ function App() {
       <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: '16px 0px' }}>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
-              <ClickNHold
-                style={{ flex: 1 }}
-                time={4}
-                onEnd={onSwitchEnv}>
-                <p>Enviroment</p>
-              </ClickNHold>
-              <Select
-                options={options}
-                onChange={onSelect}
-                defaultValue={defaultOption}
-                placeholder="Select an option"
-                className='dropbox'
-              />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <p style={{ flex: 1 }}>Ngôn ngữ cho SDK</p>
               <Select
                 options={optionsLang}
@@ -878,7 +747,6 @@ function App() {
                 defaultValue={defaultOptionLang}
                 placeholder="Select an option"
                 className='dropbox'
-              // styles={customStyles}
               />
             </div>
           </div>
@@ -971,20 +839,8 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => pay()}>Thanh toán</button>
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-                </div>
-
-                <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <input maxLength={9} style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
-                  <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
-                </div>
-
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
-
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay with method</button>
+                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
                   <Select
                     options={listMethod}
                     onChange={onSelectMethod}
@@ -993,10 +849,15 @@ function App() {
                     className='dropdownPay'
 
                   />
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payWithMethodMoney} onChange={handleChangePayWithMethodMoney} />
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
                 </div>
 
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListPaymentMethod()}>Get List Payment Method</button>
+                <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <input maxLength={9} style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
+                  <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
+                </div>
+
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
@@ -1017,7 +878,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.3.1</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.2</a></p>
             </div>
           </>
         )}
