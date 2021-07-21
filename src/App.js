@@ -25,27 +25,27 @@ const ERROR_CODE = {
 }
 
 let CONFIGS = {
-  // production: {
-  //   appToken:
-  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
-  //   publicKey: `-----BEGIN PUBLIC KEY-----
-  //     MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
-  //     UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
-  //     -----END PUBLIC KEY-----`,
-  //   privateKey: `-----BEGIN RSA PRIVATE KEY-----
-  //     MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
-  //     yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
-  //     5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
-  //     AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
-  //     ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
-  //     xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
-  //     A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
-  //     -----END RSA PRIVATE KEY-----`,
-  //   env: "PRODUCTION",
-  //   secretKey: "bda4d9de88f37efb93342d8764ac9b84",
-  //   appId: "7",
-  //   storeId: 25092940
-  // },
+  production: {
+    appToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
+    publicKey: `-----BEGIN PUBLIC KEY-----
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
+      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
+      -----END PUBLIC KEY-----`,
+    privateKey: `-----BEGIN RSA PRIVATE KEY-----
+      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
+      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
+      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
+      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
+      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
+      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
+      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
+      -----END RSA PRIVATE KEY-----`,
+    env: "PRODUCTION",
+    secretKey: "bda4d9de88f37efb93342d8764ac9b84",
+    appId: "7",
+    storeId: 25092940
+  },
   sandbox: {
     appToken:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTQsImlhdCI6MTYxNDE2NDI3MH0.MmzNL81YTx8XyTu6SczAqZtnCA_ALsn9GHsJGBKJSIk",
@@ -113,10 +113,8 @@ A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
 
 
 function App() {
-  const env = 'sandbox'
   const isDesktop = useMediaQuery({ minWidth: 992 })
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 })
-
   const refPaymeSDK = useRef(null)
   const appRef = useRef(null)
   const [deviceId, setDeviceId] = useState('')
@@ -126,6 +124,7 @@ function App() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [balancce, setBalance] = useState(0)
 
+  const [env, setEnv] = useState('sandbox')
   const [appID, setAppID] = useState(CONFIGS[env].appId)
   const [appToken, setAppToken] = useState(CONFIGS[env].appToken)
   const [publicKey, setPublicKey] = useState(CONFIGS[env].publicKey)
@@ -161,20 +160,35 @@ function App() {
     appId: appID,
   })
 
+  const options = [
+    { value: 'dev', label: 'dev' },
+    { value: 'sandbox', label: 'sandbox' },
+    { value: 'staging', label: 'staging' },
+    { value: 'production', label: 'production' },
+  ]
+
   const optionsLang = [
     { value: LANGUAGES.VI, label: 'Tiếng Việt' },
     { value: LANGUAGES.EN, label: 'Tiếng Anh' }
   ]
 
-  const [listService, setListService] = useState([])
   const listMethod = Object.keys(PAY_CODE).map(key => ({ label: key, value: PAY_CODE[key] }));
 
+  const [listService, setListService] = useState([])
   const [serviceCode, setServiceCode] = useState('')
-  const [payCode, setPayCode] = useState('')
-
+  const [payCode, setPayCode] = useState()
+  
+  const defaultOption = options[1];
   const defaultOptionLang = optionsLang[0];
 
   useEffect(() => {
+    if (window.location.hostname === 'sbx-sdk-demo.payme.net.vn') {
+      setEnv('sandbox')
+      handleChangeEnv('sandbox')
+    } else if (window.location.hostname === 'staging-sdk-demo.payme.net.vn') {
+      setEnv('staging')
+      handleChangeEnv('staging')
+    }
     /* iOS re-orientation fix */
     if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i)) {
       /* iOS hides Safari address bar */
@@ -306,6 +320,15 @@ function App() {
       privateKey: privateKey,
       appId: appID,
     })
+  }
+
+  const handleChangeEnv = (env) => {
+    setAppID(CONFIGS[env].appId)
+    setAppToken(CONFIGS[env].appToken)
+    setPublicKey(CONFIGS[env].publicKey)
+    setPrivateKey(CONFIGS[env].privateKey)
+    setSecretKey(CONFIGS[env].secretKey)
+    setIsLogin(false)
   }
 
   const handleRestoreDefault = () => {
@@ -541,7 +564,6 @@ function App() {
     if (!checkMoney(payMoney)) {
       return
     }
-
     const data = {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
@@ -642,6 +664,12 @@ function App() {
     }
   }
 
+  const onSelect = (selected) => {
+    setEnv(selected.value)
+    handleChangeEnv(selected.value)
+  }
+
+
   const onSelectLang = (selected) => {
     setLang(selected.value)
   }
@@ -739,6 +767,18 @@ function App() {
       <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: '16px 0px' }}>
+            {window.location.hostname === 'localhost' && (
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <p style={{ flex: 1 }}>Enviroment</p>
+                <Select
+                  options={options}
+                  onChange={onSelect}
+                  defaultValue={defaultOption}
+                  placeholder="Select an option"
+                  className='dropbox'
+                />
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <p style={{ flex: 1 }}>Ngôn ngữ cho SDK</p>
               <Select
@@ -844,7 +884,7 @@ function App() {
                   <Select
                     options={listMethod}
                     onChange={onSelectMethod}
-                    // value={defaultOption}
+                    // defaultValue={defaultOptionPayCode}
                     placeholder="Chọn phương thức"
                     className='dropdownPay'
 
@@ -878,7 +918,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.2</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.4</a></p>
             </div>
           </>
         )}
