@@ -128,6 +128,12 @@ refWebPaymeSDK.current.login(
 | `ENV.SANDBOX` | `enum` | Môi trường sandbox. |
 | `ENV.PRODUCTION` | `enum` | Môi trường production. |
 
+| Property | Type | Description |
+| ------------------ | ------ | ---------------------- |
+| `NOT_ACTIVED` | `enum` | Tài khoản chưa kích hoạt. |
+| `NOT_KYC` | `enum` | Tài khoản chưa định danh. |
+| `KYC_APPROVED` | `enum` | Tài khoản đã định danh. |
+
 #### Parameters
 | Property | Type | Description |
 | -------------- | ---------- | ------------------------------------------------------------ |
