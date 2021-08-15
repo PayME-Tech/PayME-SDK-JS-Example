@@ -86,7 +86,7 @@ class Example extends Component {
 | `SYSTEM` | `-2` |  Lỗi hệ thống |
 | `LIMIT` | `-3` |  app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
 | `NOT_ACTIVED` | `-4` | Lỗi tài khoản chưa kích hoạt |
-| `NOT_KYC` | `-5` | Lỗi tài khoản chưa định danh |
+| `KYC_NOT_APPROVED` | `-5` | Lỗi tài khoản chưa định danh |
 | `PAYMENT_ERROR` | `-6` | Thanh toán thất bại |
 | `ERROR_KEY_ENCODE` | `-7` | Lỗi mã hóa/giải mã dữ liệu |
 | `USER_CANCELLED` | `-8` | Người dùng thao tác hủy | 
@@ -133,6 +133,8 @@ refWebPaymeSDK.current.login(
 | `NOT_ACTIVED` | `enum` | Tài khoản chưa kích hoạt. |
 | `NOT_KYC` | `enum` | Tài khoản chưa định danh. |
 | `KYC_APPROVED` | `enum` | Tài khoản đã định danh. |
+| `KYC_REVIEW` | `enum` | Tài khoản đang chờ duyệt |
+| `KYC_REJECTED` | `enum` | Tài khoản bị từ chối |
 
 #### Parameters
 | Property | Type | Description |
