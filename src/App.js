@@ -15,7 +15,7 @@ const ERROR_CODE = {
   NETWORK: -1,
   SYSTEM: -2,
   LITMIT: -3,
-  NOT_ACTIVED: -4,
+  NOT_ACTIVATED: -4,
   KYC_NOT_APPROVED: -5,
   PAYMENT_ERROR: -6,
   ERROR_KEY_ENCODE: -7,
@@ -242,7 +242,7 @@ function App() {
         },
         (error) => {
           console.log('error login', error);
-          if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_ACTIVED) {
+          if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             setIsLogin(true)
           } else {
             showErrorMessage(error)
@@ -406,7 +406,7 @@ function App() {
           } else if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
           }
-          else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVED) {
+          else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
           }
 
@@ -440,7 +440,7 @@ function App() {
             setIsOpen(false)
           } else if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
-          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVED) {
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
           }
 
@@ -475,7 +475,7 @@ function App() {
             setIsOpen(false)
           } else if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
-          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVED) {
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
           }
 
@@ -874,7 +874,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.8</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.9</a></p>
             </div>
           </>
         )}
