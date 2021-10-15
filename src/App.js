@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import WebPaymeSDK, { LANGUAGES, PAY_CODE } from 'web-payme-sdk';
-// import WebPaymeSDK, { LANGUAGES, PAY_CODE } from './PaymeSDK';
+import WebPaymeSDK, { LANGUAGES } from 'web-payme-sdk';
+// import WebPaymeSDK, { LANGUAGES } from './PaymeSDK';
 import Select from 'react-select';
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
@@ -24,7 +24,38 @@ const ERROR_CODE = {
   CLOSE_IFRAME: -10
 }
 
+const PAY_CODE = {
+  PAYME: 'PAYME',
+  ATM: 'ATM',
+  CREDIT: 'CREDIT',
+  MANUAL_BANK: 'MANUAL_BANK',
+  VN_PAY: 'VN_PAY',
+  MOMO: 'MOMO',
+  ZALO_PAY: 'ZALO_PAY'
+}
+
 let CONFIGS = {
+  production: {
+    appToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
+    publicKey: `-----BEGIN PUBLIC KEY-----
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
+      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
+      -----END PUBLIC KEY-----`,
+    privateKey: `-----BEGIN RSA PRIVATE KEY-----
+      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
+      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
+      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
+      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
+      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
+      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
+      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
+      -----END RSA PRIVATE KEY-----`,
+    env: "PRODUCTION",
+    secretKey: "bda4d9de88f37efb93342d8764ac9b84",
+    appId: "7",
+    storeId: 25092940
+  },
   sandbox: {
     appToken:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTQsImlhdCI6MTYxNDE2NDI3MH0.MmzNL81YTx8XyTu6SczAqZtnCA_ALsn9GHsJGBKJSIk",
@@ -45,6 +76,16 @@ let CONFIGS = {
     secretKey: "de7bbe6566b0f1c38898b7751b057a94",
     appId: "14",
     storeId: 24088141
+  },
+  staging: {
+    appToken:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYyNjkyOTQ1M30.RifF-H0C4w29WDRV0AGgP0qoffaAYbdmp_uyS69DEhI",
+    publicKey: `-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----`,
+    privateKey: `-----BEGIN RSA PRIVATE KEY-----MIIBOQIBAAJAeEi2lnt0XYJBk068ncKYjG+C4dS1tZTxvVQrRKgzhrn5RY8NYhGR6rKI6SmfLuZfJwzJ7pAswHQcsZXq8bnFKQIDAQABAkAdt2Eclk1uWKLYwMgKdav4bgg4wLNPtAdxDd1Orftk2jBEzErHn8UEX5z1az1TEUpWvt0iPC3SDDtsJBI0pQ+tAiEAvkd9jsf6exffyG8Kjn/UGa//Xu7gv1FKhfK9+1i94N8CIQCh1D0b0IUHzPKC7F7N7IUeLGuLVMrT1xK78YbNi23y9wIgWI5jJCF0NPeugdUUH6/kYbQkcOVSGhhWS7LmsmThshcCIQCP+AFlfVzcU7hsQV0WVhUXgu0qR4UqcWx5R6ZltmVagQIgfYQl+kA7IIWCY7ist/xAmSAgmaitNYmfvPW8YnQp8fU=-----END RSA PRIVATE KEY-----`,
+    env: "STAGING",
+    secretKey: "1cf4df491c0972ff96fffb10327e4963",
+    appId: "18",
+    storeId: 25092940
   },
   dev: {
     appToken:
@@ -103,6 +144,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false)
 
   const [loading, setLoading] = useState(false)
+  const [showOption, setShowOption] = useState(false)
 
   const [configs, setConfigs] = useState({
     appToken,
@@ -120,7 +162,9 @@ function App() {
 
   const options = [
     { value: 'dev', label: 'dev' },
-    { value: 'sandbox', label: 'sandbox' }
+    { value: 'sandbox', label: 'sandbox' },
+    { value: 'staging', label: 'staging' },
+    { value: 'production', label: 'production' },
   ]
 
   const optionsLang = [
@@ -133,7 +177,7 @@ function App() {
   const [listService, setListService] = useState([])
   const [serviceCode, setServiceCode] = useState('')
   const [payCode, setPayCode] = useState()
-  
+
   const defaultOption = options[1];
   const defaultOptionLang = optionsLang[0];
 
@@ -224,7 +268,14 @@ function App() {
     setLoading(true)
     resetState()
     try {
-      const connectToken = encrypt(JSON.stringify({ userId, timestamp: Date.now(), phone: phoneNumber }), secretKey)
+      const connectToken = encrypt(JSON.stringify({
+        userId,
+        timestamp: Date.now(),
+        phone: phoneNumber,
+      }), secretKey)
+
+      // const connectToken ="aIS749Kt66U6b4XMImd5OW7ITuPRxQJnjEFEpG1VloQI1VKjpcHSX2qOEqKedOMJAN6+dAyFbQyzPBE6MNehE+8ZffHTuGpnxHVQwVaaNCMwEMUqPs0MkoYi0IXspcg1bHtPq8CFZQERGe0f8jESWLKKCW4j7oNFuFaYUBg+cFMucbPUngsRu/VqezDxO1lpVDs2PvI+41R9CrKWKxGgsq59mZwOxwrxa3uH7uDuewI0oS72n/9X/jciMd9zgxR85nZrmOzw2WS0kT8T/z642v1uz8pmx32+wbYISt7PbkYhBqswoa2yqQPL5Y2Vzi5mtSH0QIOZKbA5Bp8q0OU/9GJNIA34pqmYqpSNhDBaTLopx6G8NEF4ET17LHpwMkQ43DgKbMiDc5T5i92kPCCnVv5NbbgnhKk0TWiJu/tL8nsi5y9GYWgRuiWpUFF1UQBQoAUcfGxY0lUQyrxWzlXgpB7ZuV4yCtP0kJMH+1CJe36h7YlTcpRRUYUZsRXheDA8i2fIn2nKWNkQSIE0owVhbqC9rxmceeKMGkXX7Dw/eYK2pgHvMVbEGeVVb7cUfg7DPGwp1vvZ9lVlUj8zUAGizmdj5sVH4axvgerFt/cU4gJ0Dg2gmtiZi0hT5RrABM36td5GheGPu9S7DkUZEysqHUtEg9/jGij9Pq1+/nNugxecZxVxW2VNECmZtthZ0wDXItmyPN7tnt1kHyNTSCMZQT0gYNKzRzKI3In3X3eudItIThULJVH3gHEWvkAFa1wo2NMegO1OL16SgUBNWyt01Fj0iBAHTXdcrKLXgffw++nwAh+S/XZbR/Wd1oHDe6J0IFR4x2GyTcBCNelSTjU1F71rEHIWIG9AijtuHJTQEM3UwjATNrASjrkDC5Po9hRT"
+
       const configsLogin = {
         ...configs,
         connectToken,
@@ -276,6 +327,13 @@ function App() {
       privateKey: privateKey,
       appId: appID,
     })
+    refPaymeSDK.current?.logout(
+      (res) => {
+        console.log('response logout', res)
+      },
+      (error) => {
+        console.log('error logout', error);
+      })
   }
 
   const handleChangeEnv = (env) => {
@@ -334,6 +392,31 @@ function App() {
           }
           setLoading(false)
           console.log('onError openWallet', error)
+        }
+      )
+    }, 100)
+  }
+
+  const openHistory = () => {
+    appRef.current.scrollTo(0, 0)
+    setTimeout(() => {
+      setIsOpen(true)
+      refPaymeSDK.current?.openHistory(
+        (response) => {
+          setLoading(false)
+          console.log('onSucces openHistory', response)
+        },
+        (error) => {
+          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
+            setIsOpen(false)
+          } else {
+            if (error?.code === ERROR_CODE.EXPIRED) {
+              logout()
+            }
+            showErrorMessage(error)
+          }
+          setLoading(false)
+          console.log('onError openHistory', error)
         }
       )
     }, 100)
@@ -520,6 +603,7 @@ function App() {
     if (!checkMoney(payMoney)) {
       return
     }
+    console.log('paycode', payCode)
     const data = {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
@@ -709,6 +793,13 @@ function App() {
     setShowLog(event.target.checked)
   }
 
+  const handleChangeDevService = (event) => {
+    if (event?.target.value === '159753123456') {
+      setShowOption(true)
+    } else {
+      setShowOption(false)
+    }
+  }
   const isMobileStyle = (isDesktop || isTablet) ? {
     height: '80%',
     width: 500,
@@ -723,7 +814,7 @@ function App() {
       <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: '16px 0px' }}>
-            {window.location.hostname === 'localhost' && (
+            {(window.location.hostname === 'localhost' || showOption) && (
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <p style={{ flex: 1 }}>Enviroment</p>
                 <Select
@@ -783,7 +874,10 @@ function App() {
               <input placeholder="Optional" type='checkbox' checked={showLog} onChange={handleChangeShowLog} />
               <p>Show log</p>
             </div>
-
+            <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
+              <p>Code</p>
+              <input style={{ padding: 8 }} placeholder="Required" type='password' onChange={handleChangeDevService} />
+            </div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
               <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => handleRestoreDefault()}>Reset Defeault</button>
               <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => handleSave()}>Save</button>
@@ -802,9 +896,61 @@ function App() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '16px' }}>
-              <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => login()}>Login</button>
-              <button style={{ width: '40%', padding: 8 }} type="button" onClick={() => logout()}>Logout</button>
+              <div
+                onClick={() => login()}
+                onKeyPress={() => login()}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  border: '1px solid #cbcbcb',
+                  width: '40%',
+                  height: 25,
+                  outline: 'none',
+                  padding: 8,
+                  borderRadius: 5
+                }}>
+                <p style={{ textAlign: 'center', margin: 0 }}>Login</p>
+              </div>
+              <div
+                onClick={() => logout()}
+                onKeyPress={() => logout()}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  border: '1px solid #cbcbcb',
+                  width: '40%',
+                  height: 25,
+                  outline: 'none',
+                  padding: 8,
+                  borderRadius: 5
+                }}
+              >
+                <p style={{ textAlign: 'center', margin: 0 }}>Logout</p>
+              </div>
             </div>
+
+            <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: 16, padding: 16 }}>
+              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
+
+              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
+
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
+                <Select
+                  options={listMethod}
+                  onChange={onSelectMethod}
+                  // defaultValue={defaultOptionPayCode}
+                  placeholder="Chọn phương thức"
+                  className='dropdownPay'
+
+                />
+                <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
+              </div>
+            </div>
+
+
 
             {isLogin && (
               <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '0px   16px' }}>
@@ -818,7 +964,9 @@ function App() {
                     </div>
                   </div>
                 </div>
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
+                {/* <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button> */}
+
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openHistory()}>Open History</button>
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
@@ -835,27 +983,12 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
-                  <Select
-                    options={listMethod}
-                    onChange={onSelectMethod}
-                    // defaultValue={defaultOptionPayCode}
-                    placeholder="Chọn phương thức"
-                    className='dropdownPay'
-
-                  />
-                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-                </div>
-
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <input maxLength={9} style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
+                  <input style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
                 </div>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
-
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
                 <button style={{ borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListService()}>Get List Service</button>
                 {listService.length === 0 && (<p style={{ fontStyle: 'italic', fontSize: 12, marginBottom: 12 }}>*Để sử dụng hàm Open Service cần lấy list dịch vụ từ hàm trên</p>)}
@@ -874,7 +1007,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.9</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.12</a></p>
             </div>
           </>
         )}

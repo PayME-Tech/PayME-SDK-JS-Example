@@ -27,7 +27,7 @@ PayME SDK là bộ thư viện để các app có thể tương tác với PayME
 Hệ thống PayME sẽ cung cấp cho app tích hợp các thông tin sau:
 
 -   **PublicKey**  : Dùng để mã hóa dữ liệu, app tích hợp cần truyền cho SDK để mã hóa.
--   **AppToken**  : AppId cấp riêng định danh cho mỗi app, cần truyền cho SDK để mã hóa
+-   **AppToken**  : AppToken cấp riêng định danh cho mỗi app, cần truyền cho SDK để mã hóa
 -   **SecretKey**  : Dùng đã mã hóa và xác thực dữ liệu ở hệ thống backend cho app tích hợp.
 
 Bên App sẽ cung cấp cho hệ thống PayME các thông tin sau:
@@ -86,7 +86,7 @@ class Example extends Component {
 | `SYSTEM` | `-2` |  Lỗi hệ thống |
 | `LIMIT` | `-3` |  app cần truyền vào để giải mã dữ liệu. Bên app sẽ cung cấp cho hệ thống PayME. |
 | `NOT_ACTIVATED` | `-4` | Lỗi tài khoản chưa kích hoạt |
-| `KYC_NOT_APPROVED` | `-5` | Lỗi tài khoản chưa định danh |
+| `KYC_NOT_APPROVED` | `-5` | Lỗi tài khoản chưa được duyệt |
 | `PAYMENT_ERROR` | `-6` | Thanh toán thất bại |
 | `ERROR_KEY_ENCODE` | `-7` | Lỗi mã hóa/giải mã dữ liệu |
 | `USER_CANCELLED` | `-8` | Người dùng thao tác hủy | 
@@ -147,7 +147,7 @@ connectToken cần để truyền gọi api từ tới PayME và sẽ được t
 ```javascript
 import crypto from 'crypto'
 const data = {
-  timestamp:  34343242342,
+  timestamp:  "2021-01-20T06:53:07.621Z",
   userId :  "ABC",
   phone :  "0909998877"
 }
@@ -167,6 +167,19 @@ const connectToken = encrypted + cipher.final('base64')
 
 Trong đó ***AES*** là hàm mã hóa theo thuật toán AES. Tùy vào ngôn ngữ ở server mà bên hệ thống dùng thư viện tương ứng. Xem thêm tại đây https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
 
+#### logout
+Clear thông tin tài khoản đã login. Sau khi logout thì cần thực hiện login lại để thực hiện các chức năng.
+```javascript
+refWebPaymeSDK.current.logout(
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
+)
+```
+
 #### getAccountInfo
 App có thể dùng thuộc tính này sau khi khởi tạo SDK để biết được trạng thái liên kết tới ví PayME.
 ```javascript
@@ -183,6 +196,24 @@ refWebPaymeSDK.current.getAccountInfo(
 Hàm này được gọi khi từ app tích hợp khi muốn gọi 1 chức năng PayME bằng cách truyền vào tham số Action như trên.
 ```javascript
 refWebPaymeSDK.current.openWallet(
+   (response) => {
+      // onSuccess
+   },
+   (error) => {
+      // onError
+   }
+)
+```
+
+#### openHistory
+Hàm này được gọi khi từ app tích hợp khi muốn mở lịch sử giao dịch từ ví.
+
+** Yêu cầu tài khoản đã kích hoạt và định danh để mở lịc sử Ví 
+
+⚠️⚠️⚠️ version 1.4.10 trở đi
+
+```javascript
+refWebPaymeSDK.current.openHistory(
    (response) => {
       // onSuccess
    },
@@ -359,8 +390,9 @@ refWebPaymeSDK.current.openService(
 | onSuccess | Yes | Dùng để bắt callback khi thực hiện thành công từ PayME SDK |
 | onError | Yes | Dùng để bắt callback khi có lỗi xảy ra trong quá trình gọi PayME SDK |
 
-#### getListPaymentMethod
+#### getListPaymentMethod - ⚠️⚠️⚠️ Đã remove từ version 1.4.1 trở đi
 Hàm này được gọi khi từ app tích hợp khi muốn lấy danh sách các phương thức thanh toán mà PayME cung cấp vs từng tài khoản sau khi tài khoản đã kích hoạt và định danh thành công, dùng để truyền vào hàm pay() để chọn trực tiếp phương thức thanh toán mà app đối tác muốn
+
 ```javascript
 refWebPaymeSDK.current.getListPaymentMethod(
    { 
