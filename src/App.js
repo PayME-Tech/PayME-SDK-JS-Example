@@ -58,24 +58,24 @@ let CONFIGS = {
   },
   sandbox: {
     appToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTQsImlhdCI6MTYxNDE2NDI3MH0.MmzNL81YTx8XyTu6SczAqZtnCA_ALsn9GHsJGBKJSIk",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MzAsImlhdCI6MTYyMTgyMzQ2N30.02jQIG7fqUckNzQnx0ya52ley4nWCHWt3w6tUrrRAtQ",
     publicKey: `-----BEGIN PUBLIC KEY-----
-      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMyTFdiYBiaSIBgqFdxSgzk5LYXKocgT
-      MCx/g1gz9k2jadJ1PDohCs7N65+dh/0dTbT8CIvXrrlAgQT1zitpMPECAwEAAQ==
+      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAO4QQwo0WqZONzlJ5CMWDb6eSrO5q14r
+      D05Fc6JeC/ZfjdoO+9+G9RZrpa8eh8hIhdJ4siqHKcSiM/xlXIm6ddECAwEAAQ==
       -----END PUBLIC KEY-----`,
     privateKey: `-----BEGIN RSA PRIVATE KEY-----
-      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
-      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
-      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
-      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
-      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
-      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
-      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
+      MIIBOgIBAAJBAMRQjlsYp5aR5IliyM/WsK6JtP79wdXCkyZ/PRV1ZcvyWx5/4A6f
+      9e4G+rGF8tSWjbYs1aRkyd/NY41QX+VBULECAwEAAQJAN5TDKUGKuVOnC8q/JjEX
+      puLwLr2zsoy7Usv1hGzPnHUK+GtCyROvG88K3EM7ouE2amk0BMJY1XZ8x1KkZnuw
+      vQIhAPkFALcE+dsV9G8gDGgTBr8PRmqpkinFzIHcev/wwMhjAiEAydFWDoeCwT2d
+      bbUt/fU/KSaGomp5slt+FZxd9A/tzNsCIQCGj9OBEqlJYCXD3teVbaKZn9F3VcZr
+      2DzYd6Hnp9sk7QIgfgE7b7rfwnML1bFnU8ZJdxHcwY8lCFzjbe7BIl7HpD0CICB5
+      KQhd7pUO2s5oPAvuzi30eI2NIISncH0xGxYAS+nu
       -----END RSA PRIVATE KEY-----`,
     env: "SANDBOX",
-    secretKey: "de7bbe6566b0f1c38898b7751b057a94",
-    appId: "14",
-    storeId: 24088141
+    secretKey: "d0b1240e28a109e052fa34354e9915f9",
+    appId: "30",
+    storeId: 10581207
   },
   staging: {
     appToken:
@@ -271,7 +271,7 @@ function App() {
       const connectToken = encrypt(JSON.stringify({
         userId,
         timestamp: Date.now(),
-        phone: phoneNumber,
+        phone: phoneNumber
       }), secretKey)
 
       // const connectToken ="aIS749Kt66U6b4XMImd5OW7ITuPRxQJnjEFEpG1VloQI1VKjpcHSX2qOEqKedOMJAN6+dAyFbQyzPBE6MNehE+8ZffHTuGpnxHVQwVaaNCMwEMUqPs0MkoYi0IXspcg1bHtPq8CFZQERGe0f8jESWLKKCW4j7oNFuFaYUBg+cFMucbPUngsRu/VqezDxO1lpVDs2PvI+41R9CrKWKxGgsq59mZwOxwrxa3uH7uDuewI0oS72n/9X/jciMd9zgxR85nZrmOzw2WS0kT8T/z642v1uz8pmx32+wbYISt7PbkYhBqswoa2yqQPL5Y2Vzi5mtSH0QIOZKbA5Bp8q0OU/9GJNIA34pqmYqpSNhDBaTLopx6G8NEF4ET17LHpwMkQ43DgKbMiDc5T5i92kPCCnVv5NbbgnhKk0TWiJu/tL8nsi5y9GYWgRuiWpUFF1UQBQoAUcfGxY0lUQyrxWzlXgpB7ZuV4yCtP0kJMH+1CJe36h7YlTcpRRUYUZsRXheDA8i2fIn2nKWNkQSIE0owVhbqC9rxmceeKMGkXX7Dw/eYK2pgHvMVbEGeVVb7cUfg7DPGwp1vvZ9lVlUj8zUAGizmdj5sVH4axvgerFt/cU4gJ0Dg2gmtiZi0hT5RrABM36td5GheGPu9S7DkUZEysqHUtEg9/jGij9Pq1+/nNugxecZxVxW2VNECmZtthZ0wDXItmyPN7tnt1kHyNTSCMZQT0gYNKzRzKI3In3X3eudItIThULJVH3gHEWvkAFa1wo2NMegO1OL16SgUBNWyt01Fj0iBAHTXdcrKLXgffw++nwAh+S/XZbR/Wd1oHDe6J0IFR4x2GyTcBCNelSTjU1F71rEHIWIG9AijtuHJTQEM3UwjATNrASjrkDC5Po9hRT"
@@ -279,7 +279,8 @@ function App() {
       const configsLogin = {
         ...configs,
         connectToken,
-        phone: phoneNumber ?? ''
+        phone: phoneNumber ?? '',
+        userId
       }
 
       refPaymeSDK.current?.login(configsLogin,
@@ -448,8 +449,10 @@ function App() {
   }
 
   const getBalance = () => {
-    refPaymeSDK.current?.getBalance(
+    refPaymeSDK.current?.getWalletInfo(
       (response) => {
+        console.log('onSucces getBalance', response)
+
         setLoading(false)
         setBalance(response?.balance ?? 0)
       },
@@ -887,7 +890,7 @@ function App() {
           <>
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
               <p>UserId</p>
-              <input style={{ padding: 8, border: '0.5px solid #cbcbcb' }} inputMode='numeric' pattern="[0-9]*" placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
+              <input style={{ padding: 8, border: '0.5px solid #cbcbcb' }} placeholder="Required" type='text' value={userId} onChange={handleChangeUserId} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', padding: '0px 16px' }}>
@@ -967,6 +970,8 @@ function App() {
                 {/* <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button> */}
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openHistory()}>Open History</button>
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getBalance()}>Get Balance</button>
+
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
@@ -1007,7 +1012,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.12</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.17</a></p>
             </div>
           </>
         )}
