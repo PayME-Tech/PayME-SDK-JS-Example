@@ -35,27 +35,6 @@ const PAY_CODE = {
 }
 
 let CONFIGS = {
-  production: {
-    appToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
-    publicKey: `-----BEGIN PUBLIC KEY-----
-      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
-      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
-      -----END PUBLIC KEY-----`,
-    privateKey: `-----BEGIN RSA PRIVATE KEY-----
-      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
-      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
-      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
-      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
-      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
-      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
-      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
-      -----END RSA PRIVATE KEY-----`,
-    env: "PRODUCTION",
-    secretKey: "bda4d9de88f37efb93342d8764ac9b84",
-    appId: "7",
-    storeId: 25092940
-  },
   sandbox: {
     appToken:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MzAsImlhdCI6MTYyMTgyMzQ2N30.02jQIG7fqUckNzQnx0ya52ley4nWCHWt3w6tUrrRAtQ",
@@ -76,16 +55,6 @@ let CONFIGS = {
     secretKey: "d0b1240e28a109e052fa34354e9915f9",
     appId: "30",
     storeId: 10581207
-  },
-  staging: {
-    appToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MTgsImlhdCI6MTYyNjkyOTQ1M30.RifF-H0C4w29WDRV0AGgP0qoffaAYbdmp_uyS69DEhI",
-    publicKey: `-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIKTO8wcUDUEFK6c1xWmappjJTpSLR5+0y7j42/S07SdHknPOVVH/EnVj0UxoI+3AZloBwqgs7gV4DyMPHEZPX8CAwEAAQ==-----END PUBLIC KEY-----`,
-    privateKey: `-----BEGIN RSA PRIVATE KEY-----MIIBOQIBAAJAeEi2lnt0XYJBk068ncKYjG+C4dS1tZTxvVQrRKgzhrn5RY8NYhGR6rKI6SmfLuZfJwzJ7pAswHQcsZXq8bnFKQIDAQABAkAdt2Eclk1uWKLYwMgKdav4bgg4wLNPtAdxDd1Orftk2jBEzErHn8UEX5z1az1TEUpWvt0iPC3SDDtsJBI0pQ+tAiEAvkd9jsf6exffyG8Kjn/UGa//Xu7gv1FKhfK9+1i94N8CIQCh1D0b0IUHzPKC7F7N7IUeLGuLVMrT1xK78YbNi23y9wIgWI5jJCF0NPeugdUUH6/kYbQkcOVSGhhWS7LmsmThshcCIQCP+AFlfVzcU7hsQV0WVhUXgu0qR4UqcWx5R6ZltmVagQIgfYQl+kA7IIWCY7ist/xAmSAgmaitNYmfvPW8YnQp8fU=-----END RSA PRIVATE KEY-----`,
-    env: "STAGING",
-    secretKey: "1cf4df491c0972ff96fffb10327e4963",
-    appId: "18",
-    storeId: 25092940
   },
   dev: {
     appToken:
@@ -162,9 +131,7 @@ function App() {
 
   const options = [
     { value: 'dev', label: 'dev' },
-    { value: 'sandbox', label: 'sandbox' },
-    { value: 'staging', label: 'staging' },
-    { value: 'production', label: 'production' },
+    { value: 'sandbox', label: 'sandbox' }
   ]
 
   const optionsLang = [
@@ -331,6 +298,7 @@ function App() {
     refPaymeSDK.current?.logout(
       (res) => {
         console.log('response logout', res)
+        alert('Logout success');
       },
       (error) => {
         console.log('error logout', error);
@@ -934,27 +902,6 @@ function App() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: 16, padding: 16 }}>
-              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
-
-              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
-
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
-                <Select
-                  options={listMethod}
-                  onChange={onSelectMethod}
-                  // defaultValue={defaultOptionPayCode}
-                  placeholder="Chọn phương thức"
-                  className='dropdownPay'
-
-                />
-                <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-              </div>
-            </div>
-
-
-
             {isLogin && (
               <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '0px   16px' }}>
 
@@ -967,11 +914,9 @@ function App() {
                     </div>
                   </div>
                 </div>
-                {/* <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button> */}
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openHistory()}>Open History</button>
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getBalance()}>Get Balance</button>
-
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
@@ -988,12 +933,26 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
 
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
+                  <Select
+                    options={listMethod}
+                    onChange={onSelectMethod}
+                    placeholder="Chọn phương thức"
+                    className='dropdownPay'
+
+                  />
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
+                </div>
+
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
                   <input style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
                 </div>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
+
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
                 <button style={{ borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListService()}>Get List Service</button>
                 {listService.length === 0 && (<p style={{ fontStyle: 'italic', fontSize: 12, marginBottom: 12 }}>*Để sử dụng hàm Open Service cần lấy list dịch vụ từ hàm trên</p>)}
@@ -1012,7 +971,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.17</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.18</a></p>
             </div>
           </>
         )}
