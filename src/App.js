@@ -21,7 +21,7 @@ const ERROR_CODE = {
   ERROR_KEY_ENCODE: -7,
   USER_CANCELLED: -8,
   NOT_LOGIN: -9,
-  CLOSE_IFRAME: -10
+  // CLOSE_IFRAME: -10
 }
 
 const PAY_CODE = {
@@ -140,8 +140,6 @@ function App() {
   const [isSettings, setIsSettings] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
   const [showLog, setShowLog] = useState(false)
-
-  const [isOpen, setIsOpen] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [showOption, setShowOption] = useState(false)
@@ -331,6 +329,7 @@ function App() {
     refPaymeSDK.current?.logout(
       (res) => {
         console.log('response logout', res)
+        alert('Logout success');
       },
       (error) => {
         console.log('error logout', error);
@@ -376,21 +375,16 @@ function App() {
   const openWallet = () => {
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.openWallet(
         (response) => {
           setLoading(false)
           console.log('onSucces openWallet', response)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-            }
-            showErrorMessage(error)
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          showErrorMessage(error)
           setLoading(false)
           console.log('onError openWallet', error)
         }
@@ -401,21 +395,16 @@ function App() {
   const openHistory = () => {
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.openHistory(
         (response) => {
           setLoading(false)
           console.log('onSucces openHistory', response)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-            }
-            showErrorMessage(error)
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          showErrorMessage(error)
           setLoading(false)
           console.log('onError openHistory', error)
         }
@@ -434,14 +423,10 @@ function App() {
         setLoading(false)
       },
       (error) => {
-        if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-          setIsOpen(false)
-        } else {
-          if (error?.code === ERROR_CODE.EXPIRED) {
-            logout()
-          }
-          showErrorMessage(error)
+        if (error?.code === ERROR_CODE.EXPIRED) {
+          logout()
         }
+        showErrorMessage(error)
         setLoading(false)
         console.log('onError scanQR', error)
       }
@@ -475,24 +460,20 @@ function App() {
 
     const data = {
       amount: env === 'sandbox' ? Number(depositMoney) : 10000,
-      closeWhenDone: true
+      closeWhenDone: false
     }
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.deposit(data,
         (response) => {
           console.log('onSucces Deposit', response)
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
+          if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
-          }
-          else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
+          } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
           }
 
@@ -510,21 +491,18 @@ function App() {
 
     const data = {
       amount: env === 'sandbox' ? Number(withdrawMoney) : 10000,
-      closeWhenDone: true
+      closeWhenDone: false
     }
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.withdraw(data,
         (response) => {
           console.log('onSucces Withdraw', response)
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
+          if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
           } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
@@ -545,21 +523,18 @@ function App() {
     const data = {
       amount: env === 'sandbox' ? Number(transferMoney) : 10000,
       description: 'Chuyển tiền',
-      closeWhenDone: true
+      closeWhenDone: false
     }
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.transfer(data,
         (response) => {
           console.log('onSucces Transfer', response)
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else if (error?.code === ERROR_CODE.EXPIRED) {
+          if (error?.code === ERROR_CODE.EXPIRED) {
             logout()
           } else if (error?.code === ERROR_CODE.NOT_LOGIN || error?.code === ERROR_CODE.KYC_NOT_APPROVED || error?.code === ERROR_CODE.NOT_ACTIVATED) {
             showErrorMessage(error)
@@ -580,21 +555,16 @@ function App() {
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.payQRCode(data,
         (response) => {
           console.log('onSucces Pay', response)
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-            }
-            showErrorMessage(error)
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          showErrorMessage(error)
           setLoading(false)
           console.log('error pay', error);
         }
@@ -617,21 +587,17 @@ function App() {
 
     appRef.current.scrollTo(0, 0)
     setTimeout(() => {
-      setIsOpen(true)
       refPaymeSDK.current?.pay(data,
         (response) => {
           console.log('onSucces payWithMethod', response)
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-            }
-            showErrorMessage(error)
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          showErrorMessage(error)
+
           setLoading(false)
           console.log('error payWithMethod', error);
         }
@@ -690,14 +656,10 @@ function App() {
           setLoading(false)
         },
         (error) => {
-          if (error?.code === ERROR_CODE.CLOSE_IFRAME) {
-            setIsOpen(false)
-          } else {
-            if (error?.code === ERROR_CODE.EXPIRED) {
-              logout()
-            }
-            showErrorMessage(error)
+          if (error?.code === ERROR_CODE.EXPIRED) {
+            logout()
           }
+          showErrorMessage(error)
           setLoading(false)
           console.log('onError openService', error)
         }
@@ -814,7 +776,7 @@ function App() {
 
   return (
     <>
-      <div ref={appRef} style={{ position: 'relative', overflowY: isOpen ? 'hidden' : 'unset' }} className="App">
+      <div ref={appRef} style={{ position: 'relative' }} className="App">
         <div style={{ display: 'flex', flexDirection: 'row', padding: '0px 16px', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1, margin: '16px 0px' }}>
             {(window.location.hostname === 'localhost' || showOption) && (
@@ -934,27 +896,6 @@ function App() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: 16, padding: 16 }}>
-              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
-
-              <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
-
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
-                <Select
-                  options={listMethod}
-                  onChange={onSelectMethod}
-                  // defaultValue={defaultOptionPayCode}
-                  placeholder="Chọn phương thức"
-                  className='dropdownPay'
-
-                />
-                <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
-              </div>
-            </div>
-
-
-
             {isLogin && (
               <div style={{ display: 'flex', backgroundColor: 'gray', borderRadius: 5, flexDirection: 'column', margin: '0px 16px', padding: '0px   16px' }}>
 
@@ -967,11 +908,9 @@ function App() {
                     </div>
                   </div>
                 </div>
-                {/* <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button> */}
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openWallet()}>Open Wallet</button>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => openHistory()}>Open History</button>
-                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getBalance()}>Get Balance</button>
-
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, marginRight: 16, backgroundColor: '#e8f2e8' }} type="button" onClick={() => deposit()}>Nạp tiền ví</button>
@@ -988,12 +927,26 @@ function App() {
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ padding: 6, border: 'none', outline: 'none' }} type='text' value={depositMoney} onChange={handleChangeTransferMoney} />
                 </div>
 
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <button style={{ flex: 1, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8', marginRight: 16 }} type="button" onClick={() => payWithMethod()}>Pay</button>
+                  <Select
+                    options={listMethod}
+                    onChange={onSelectMethod}
+                    placeholder="Chọn phương thức"
+                    className='dropdownPay'
+
+                  />
+                  <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
+                </div>
+
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
                   <input style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
                   <button style={{ borderRadius: 10, padding: 8, flex: 1, backgroundColor: '#e8f2e8' }} type="button" onClick={() => onPayQRCode()}>Pay QR Code</button>
                 </div>
 
                 <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => scanQR()}>Scan QRCode</button>
+
+                <button style={{ marginBottom: 12, borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getAccountInfo()}>Get Account Info</button>
 
                 <button style={{ borderRadius: 10, padding: 8, backgroundColor: '#e8f2e8' }} type="button" onClick={() => getListService()}>Get List Service</button>
                 {listService.length === 0 && (<p style={{ fontStyle: 'italic', fontSize: 12, marginBottom: 12 }}>*Để sử dụng hàm Open Service cần lấy list dịch vụ từ hàm trên</p>)}
@@ -1012,7 +965,7 @@ function App() {
               </div>
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.17</a></p>
+              <p>Version: <a href="https://www.npmjs.com/package/web-payme-sdk" target="_blank" rel="noreferrer">web-payme-sdk 1.4.18</a></p>
             </div>
           </>
         )}
