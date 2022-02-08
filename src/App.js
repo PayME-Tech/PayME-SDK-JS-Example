@@ -37,24 +37,30 @@ const PAY_CODE = {
 let CONFIGS = {
   production: {
     appToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6NywiaWF0IjoxNjE0OTExMDE0fQ.PJ0ke0Ky_0BoMPi45Cu803VlR8F3e8kOMoNh9I07AR4",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6MjMsImlhdCI6MTYzMTg3MDk0Mn0.wTwzrGjoNQ2G8x0L61pI_jpRG82d-aVP7TGvkx0vJd4",
     publicKey: `-----BEGIN PUBLIC KEY-----
-      MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJQKJge1dTHz6Qkyz95X92QnsgDqerCB
-      UzBmt/Qg+5E/oKpw7RBfni3SlCDGotBJH437YvsDBMx8OMCP8ROd7McCAwEAAQ==
-      -----END PUBLIC KEY-----`,
+    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALZVqg6aqbDCuDvd1N/HHSOCkiRF90uZ
+    838bEALxbstkUhYlfaAI7w8OcmIZDImefMkUnXCzZ74qw/GE9XKOJ9MCAwEAAQ==
+    -----END PUBLIC KEY-----`,
     privateKey: `-----BEGIN RSA PRIVATE KEY-----
-      MIIBOQIBAAJAZCKupmrF4laDA7mzlQoxSYlQApMzY7EtyAvSZhJs1NeW5dyoc0XL
-      yM+/Uxuh1bAWgcMLh3/0Tl1J7udJGTWdkQIDAQABAkAjzvM9t7kD84PudR3vEjIF
-      5gCiqxkZcWa5vuCCd9xLUEkdxyvcaLWZEqAjCmF0V3tygvg8EVgZvdD0apgngmAB
-      AiEAvTF57hIp2hkf7WJnueuZNY4zhxn7QNi3CQlGwrjOqRECIQCHfqO53A5rvxCA
-      ILzx7yXHzk6wnMcGnkNu4b5GH8usgQIhAKwv4WbZRRnoD/S+wOSnFfN2DlOBQ/jK
-      xBsHRE1oYT3hAiBSfLx8OAXnfogzGLsupqLfgy/QwYFA/DSdWn0V/+FlAQIgEUXd
-      A8pNN3/HewlpwTGfoNE8zCupzYQrYZ3ld8XPGeQ=
-      -----END RSA PRIVATE KEY-----`,
+    MIICXAIBAAKBgQCwl44tqoc86R/mHwAANSuemdrLbnZoZaa41SfrlLScTw0b0/EM
+    aIY9z584J7qPsvaAvBVm3zuanq+YajzO9HYwdVlfzGGYdpSE656jmUtzG6J1ZEEG
+    8ewkQUdv/L+k2C9xCBAMkylInNDX3YGC8SNWpUfl6LCRkFSFi+4DfdAHfQIDAQAB
+    AoGAIL0YONMim2JE7a7VmzRAT/kKHSjvfs9Jp36tFfnNuiTVs1EJoVlHefIh/JEw
+    /y8YkClOdnHwZOwCdelMOLoNpwLNVPY4RMmcbeCraZgvhNtZDuJ8qBR0q0FV5mtY
+    gS1qNeK3l3rWJ2Nr0RZV00Hrl00SAWH3Vz0zasge5y6PLakCQQDwP/SOxgLclJTM
+    +9nKFQBC3JzqP/6OrUntZ7Y36JhB6+Krs3BY45ZCVoIzJNrF+9YV1n9tR6zpze9B
+    QnE64qSTAkEAvCs/wv8ukm5a9p4wg0uUtYDmWaZ2TqpbnODIyV8ma6GVwgOmFE/Z
+    ATM732WZYgCqZC4NGple7drTPFlpxru9rwJASzG5OXaALsnSSNYKtFUeX87szeR5
+    p+5U1RlAzv7dqMRLjbH719ZjkR/CYH+Iea74sp0QBQQJ+qOZ3rMM/YEyQQJAV/kg
+    ZlpHu848WPC8XaYIcJNDHsbkqQKcskullAAYRlnVWk+6ZeSu4BDD/T3S6C7Heu7M
+    0ZLC/xE/kQd8nJ1JoQJBAIWOtZcdBC4GhZ/J0lTWTsoptZTAGhJLwOA9wnNzQPw5
+    s3njaiburN6m/gH8Y7a8YHJU/o6JGnbBrMFNeyJvJqk=
+    -----END RSA PRIVATE KEY-----`,
     env: "PRODUCTION",
-    secretKey: "bda4d9de88f37efb93342d8764ac9b84",
-    appId: "7",
-    storeId: 25092940
+    secretKey: "0817912298a5d1b4f59749f8a2812390",
+    appId: "19",
+    storeId: 92702798
   },
   sandbox: {
     appToken:
@@ -129,6 +135,7 @@ function App() {
   const [publicKey, setPublicKey] = useState(CONFIGS[env].publicKey)
   const [privateKey, setPrivateKey] = useState(CONFIGS[env].privateKey)
   const [secretKey, setSecretKey] = useState(CONFIGS[env].secretKey)
+  const [userName, setUserName] = useState('')
 
   const [payQRCode, setPayQRCode] = useState('OPENEWALLET|24088141|PAYMENT|20000|Chuyentien|2445562323')
   const [payMoney, setPayMoney] = useState('10000')
@@ -549,7 +556,7 @@ function App() {
 
   const onPayQRCode = () => {
     const data = {
-      qrContent: payQRCode,
+      qrContent: `${payQRCode}|${userName}`,
       payCode
     }
 
@@ -581,6 +588,7 @@ function App() {
       amount: env === 'sandbox' ? Number(payMoney) : 10000,
       orderId: Date.now().toString(),
       storeId: CONFIGS[env].storeId,
+      userName,
       note: "note",
       payCode
     }
@@ -733,6 +741,9 @@ function App() {
     setPayMoney(payMoneyValid)
   }
 
+  const handleUserName = (event) => {
+    setUserName(event.target.value)
+  } 
 
   const handleChangeAppID = (event) => {
     setAppID(event.target.value)
@@ -938,6 +949,8 @@ function App() {
                   />
                   <input maxLength={9} inputMode='numeric' pattern="[0-9]*" style={{ flex: 1, marginLeft: 16, padding: 6, border: 'none', outline: 'none' }} type='text' value={payMoney} onChange={handleChangePayMoney} />
                 </div>
+
+                <input placeholder='Nhập userName...' style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={userName} onChange={handleUserName} />
 
                 <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'space-between', marginBottom: 8 }}>
                   <input style={{ padding: 6, border: 'none', outline: 'none', marginBottom: 8 }} type='text' value={payQRCode} onChange={handlePayQRCode} />
